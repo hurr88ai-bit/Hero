@@ -703,6 +703,25 @@ h2, .ach-h h3, .pl-name, .about-name{font-family:var(--f-display); font-weight:8
 .fb-send svg{width:20px; height:20px;}
 .fb-steps{margin:0; padding-inline-start:20px; color:var(--sub); font-size:13px; line-height:1.8;}
 .fb-ok{background:color-mix(in srgb, #1f9d6b 12%, var(--card)); border-radius:12px; padding:10px 12px; font-weight:700; font-size:13.5px;}
+
+/* ============ v76: ضيف أكل ============ */
+.add-step{display:flex; align-items:center; gap:8px; font-weight:800; font-size:14px; color:var(--ink); margin:2px 0 8px;}
+.add-step i{font-style:normal; display:inline-grid; place-items:center; width:22px; height:22px; border-radius:50%; background:var(--t-food); color:#fff; font-size:12.5px; font-family:var(--f-display);}
+.search-big{position:relative;}
+.search-big input{height:54px; font-size:17px; padding-inline:44px 14px; border:2px solid color-mix(in srgb, var(--t-food) 45%, var(--line)); border-radius:14px; background:var(--card);}
+.search-big input:focus{outline:none; border-color:var(--t-food); box-shadow:0 0 0 4px color-mix(in srgb, var(--t-food) 15%, transparent);}
+.search-big svg{position:absolute; inset-inline-start:14px; top:17px; width:20px; height:20px; color:var(--t-food); pointer-events:none;}
+.search-hint{font-size:12.5px; color:var(--sub); font-weight:600; margin-top:6px;}
+.db-pick{margin-top:12px; padding:12px; border-radius:14px; background:color-mix(in srgb, var(--t-food) 7%, var(--card));}
+.db-pick[data-off]{display:none;}
+.db-pick .picked{font-weight:800; font-size:15.5px; margin-bottom:8px;}
+.lib-or{margin-top:16px; padding-top:12px; border-top:1px dashed var(--line);}
+.lib-or > span{display:block; font-size:12.5px; font-weight:700; color:var(--sub); margin-bottom:8px;}
+.lib-or .lib-links{margin-bottom:0;}
+.lib-or .lib-links button{flex-direction:row; justify-content:center; gap:6px; padding:9px 6px; font-size:13.5px;}
+.lib-or .lib-links button .ic{font-size:16px;}
+.lib-or .lib-links button small{display:none;}
+.draft-h{display:flex; align-items:center; gap:8px; font-weight:800; font-size:15px; margin-bottom:8px;}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
@@ -917,7 +936,7 @@ h2, .ach-h h3, .pl-name, .about-name{font-family:var(--f-display); font-weight:8
       <div class="about-line">صُنع في العراق 🇮🇶</div>
       <div class="about-name">حر العبدلي</div>
       <div class="about-sub"><span dir="ltr">@hurr88</span></div>
-      <div class="about-sub" style="opacity:.6">نسخة تجريبية 75</div>
+      <div class="about-sub" style="opacity:.6">نسخة تجريبية 76</div>
       <div class="about-motto" dir="ltr">BE YOUR OWN HERO</div>
     </div>
 
@@ -1130,26 +1149,35 @@ h2, .ach-h h3, .pl-name, .about-name{font-family:var(--f-display); font-weight:8
 <section id="sheet" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="draft-title">
   <div class="sheet-head">
     <span class="sheet-grip" aria-hidden="true"></span>
-    <h2 id="draft-title">الوجبة الحالية</h2>
+    <h2 id="draft-title">ضيف أكل</h2>
     <button class="icon-btn" onclick="closeSheet()" aria-label="إغلاق">✕</button>
   </div>
   <div class="sheet-body">
-    <div class="lib-links" aria-label="مكتبتي">
-      <button type="button" onclick="openLib('meals')"><span class="ic">⭐</span>وجباتي<small>الجاهزة</small></button>
-      <button type="button" onclick="openLib('recipes')"><span class="ic">🍲</span>طبخاتي<small>من البيت</small></button>
-      <button type="button" onclick="openLib('products')"><span class="ic">🏷️</span>منتجاتي<small>من الملصق</small></button>
-    </div>
-    <div class="field">
-      <label for="db-food">ابحث عن أكلة</label>
-      <input type="text" id="db-food" autocomplete="off" placeholder="رز، بيض، خضار، تمن، طبختي..." oninput="onFoodSearch('db')" onkeydown="onFoodKey(event,'db')">
+    <div class="add-step"><i>1</i>اكتب اسم الأكلة واختارها</div>
+    <div class="field search-big">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <input type="search" id="db-food" autocomplete="off" enterkeyhint="search" aria-label="ابحث عن أكلة" placeholder="مثلاً: رز، بيض، راشي، دجاج…" oninput="onFoodSearch('db')" onkeydown="onFoodKey(event,'db')">
       <div class="results" id="db-results"></div>
+      <div class="search-hint" id="db-hint">اكتب أول حرفين وتطلعلك الأكلات، واضغط على اللي تريدها.</div>
     </div>
-    <div class="row" style="margin-top:10px; margin-bottom:0;">
-      <div class="field" style="flex:1 1 90px;"><label for="db-amount">الكمية</label><input type="number" id="db-amount" inputmode="decimal" min="0" step="any" placeholder="100" oninput="showFoodInfo('db')"></div>
-      <div class="field" style="flex:2 1 160px;"><label for="db-unit">الوحدة</label><select id="db-unit" onchange="onUnitChange('db')"><option value="g">غم</option></select></div>
+    <div class="db-pick" id="db-pick" data-off>
+      <div class="add-step"><i>2</i>شكد أكلت؟</div>
+      <div class="picked" id="db-picked"></div>
+      <div class="row" style="margin-bottom:0;">
+        <div class="field" style="flex:1 1 90px;"><label for="db-amount">الكمية</label><input type="number" id="db-amount" inputmode="decimal" min="0" step="any" placeholder="100" oninput="showFoodInfo('db')"></div>
+        <div class="field" style="flex:2 1 160px;"><label for="db-unit">الوحدة</label><select id="db-unit" onchange="onUnitChange('db')"><option value="g">غم</option></select></div>
+      </div>
+      <div class="goal-note" id="db-preview">اختر أكلة من نتائج البحث، وبعدين الكمية والوحدة.</div>
+      <button class="primary" style="margin-top:10px;" onclick="addDraftFromDB()">+ ضيفها للوجبة</button>
     </div>
-    <div class="goal-note" id="db-preview">اختر أكلة من نتائج البحث، وبعدين الكمية والوحدة.</div>
-    <button class="primary" style="margin-top:10px;" onclick="addDraftFromDB()">إضافة للوجبة</button>
+    <div class="lib-or">
+      <span>أو اختار من مكتبتك:</span>
+      <div class="lib-links" aria-label="مكتبتي">
+        <button type="button" onclick="openLib('meals')"><span class="ic">⭐</span>وجباتي<small>الجاهزة</small></button>
+        <button type="button" onclick="openLib('recipes')"><span class="ic">🍲</span>طبخاتي<small>من البيت</small></button>
+        <button type="button" onclick="openLib('products')"><span class="ic">🏷️</span>منتجاتي<small>من الملصق</small></button>
+      </div>
+    </div>
 
     <details class="manual">
       <summary>أكلة مو موجودة؟ أضفها يدوياً</summary>
@@ -1168,6 +1196,7 @@ h2, .ach-h h3, .pl-name, .about-name{font-family:var(--f-display); font-weight:8
     </details>
 
     <div class="card" id="draft-card" style="margin-top:16px; margin-bottom:0;">
+      <div class="draft-h">🍽️ وجبتك</div>
       <div class="field"><label for="draft-label">اسم الوجبة</label><input type="text" id="draft-label" placeholder="إذا تتركه فارغ نسميها حسب الوقت"></div>
       <div class="chips" style="margin-top:8px;" aria-label="أسماء جاهزة">
         <button type="button" class="chip" onclick="setMealName('فطور')">فطور</button>
@@ -1561,6 +1590,7 @@ const FOOD_DB = {
   "رز أبيض مسلوق (موزون مطبوخ)": {cal:130, pro:2.7, carb:28.2, fat:0.3, src:'U'},
   "رز أبيض نيء (موزون قبل الطبخ)": {cal:365, pro:7.1, carb:80, fat:0.7, src:'U'},
   "رز بسمتي مسلوق": {cal:121, pro:3.5, carb:25.2, fat:0.4, src:'E'},
+  "تمن عراقي مطبوخ (بالدهن)": {cal:170, pro:2.7, carb:28.5, fat:5, src:'E'},
   "رز بالشعرية مطبوخ": {cal:150, pro:3, carb:30, fat:2.5, src:'E'},
   "شوفان جاف": {cal:379, pro:13.2, carb:67.7, fat:6.5, src:'U'},
   "برغل مطبوخ": {cal:83, pro:3.1, carb:18.6, fat:0.2, src:'U'},
@@ -1576,7 +1606,6 @@ const FOOD_DB = {
   // مكونات نيئة وجافة (للطبخ وحاسبة الطبخة) — USDA
   "لحم غنم مفروم نيء": {cal:282, pro:16.6, carb:0, fat:23.4, src:'U'},
   "لحم بقر مفروم 85% نيء": {cal:215, pro:18.6, carb:0, fat:15, src:'U'},
-  "دجاج صدر نيء": {cal:120, pro:22.5, carb:0, fat:2.6, src:'U'},
   "دجاج فخذ نيء (بدون جلد)": {cal:121, pro:19.7, carb:0, fat:4.1, src:'U'},
   "برغل جاف": {cal:342, pro:12.3, carb:75.9, fat:1.3, src:'U'},
   "معكرونة/شعرية جافة": {cal:371, pro:13, carb:74.7, fat:1.5, src:'U'},
@@ -1601,6 +1630,9 @@ const FOOD_DB = {
   "خبز تنور (رغيف)": {cal:275, pro:9, carb:55, fat:1.5, unit:'piece', avgWeight:120, src:'E'},
 
   // بيض
+  "بيضة مقلية بالزيت": {cal:216, pro:12.6, carb:0.7, fat:17.5, unit:'piece', avgWeight:50, src:'E'},
+  "بيضة مقلية بالزبدة": {cal:202, pro:12.7, carb:0.7, fat:15.3, unit:'piece', avgWeight:50, src:'E'},
+  "بيضة مقلية بدهن الحر": {cal:216, pro:12.6, carb:0.7, fat:17.5, unit:'piece', avgWeight:50, src:'E'},
   "بيضة كاملة": {cal:143, pro:12.6, carb:0.7, fat:9.5, unit:'piece', avgWeight:50, src:'U'},
   "بياض بيضة": {cal:52, pro:10.9, carb:0.7, fat:0.2, unit:'piece', avgWeight:33, src:'U'},
 
@@ -1724,6 +1756,18 @@ const FOOD_DB = {
   "فستق حلبي": {cal:560, pro:20.2, carb:27.2, fat:45.3, src:'U'},
   "زبدة فول سوداني": {cal:588, pro:25.1, carb:19.6, fat:50.4, src:'U'},
   "طحينة": {cal:595, pro:17, carb:21.2, fat:53.8, src:'U'},
+  "سمسم": {cal:573, pro:17.7, carb:23.4, fat:49.7, src:'U'},
+  "بذور شيا": {cal:486, pro:16.5, carb:42.1, fat:30.7, src:'U'},
+  "بذور كتان": {cal:534, pro:18.3, carb:28.9, fat:42.2, src:'U'},
+  "حب شمسي مقشر (بذور دوار الشمس)": {cal:584, pro:20.8, carb:20, fat:51.5, src:'U'},
+  "حب ركي (بذور بطيخ) مقشر": {cal:557, pro:28.3, carb:15.3, fat:47.4, src:'U'},
+  "كاجو": {cal:553, pro:18.2, carb:30.2, fat:43.8, src:'U'},
+  "فول سوداني محمص": {cal:585, pro:23.7, carb:21.5, fat:49.7, src:'U'},
+  "مكسرات مشكلة محمصة": {cal:594, pro:17.3, carb:25.4, fat:51.5, src:'U'},
+  "بروتين باودر (واي)": {cal:400, pro:78, carb:8, fat:6, src:'E'},
+  "بروتين باودر نباتي": {cal:390, pro:75, carb:9, fat:7, src:'E'},
+  "دهن حر (سمن حيواني)": {cal:876, pro:0.3, carb:0, fat:99.5, src:'U'},
+  "مكعب ماجي (مرق دجاج)": {cal:267, pro:16.7, carb:18, fat:13.9, unit:'piece', avgWeight:10, src:'U'},
   "عسل": {cal:304, pro:0.3, carb:82.4, fat:0, src:'U'},
   "دبس تمر": {cal:290, pro:1.5, carb:72, fat:0.2, src:'E'},
 
@@ -1815,7 +1859,11 @@ const FOOD_MEASURES = {
   'شنينة (لبن مخيض)': [U('كوب',245,true), U('استكان',100,false)],
   'جبن قريش': [U('كوب',210,true), U('ملعقة أكل',15,false)], 'جبن أبيض (عرب/فيتا)': [U('قطعة',28,true)], 'جبن شيدر': [U('شريحة',28,true)],
   'لبنة': [U('ملعقة أكل',15,false)], 'قيمر': [U('ملعقة أكل',15,false)],
-  'زيت زيتون': M_OIL, 'زيت نباتي': M_OIL,
+  'زيت زيتون': M_OIL, 'زيت نباتي': M_OIL, 'دهن حر (سمن حيواني)': [U('ملعقة أكل',13,true), U('ملعقة شاي',4.3,true)],
+  'تمن عراقي مطبوخ (بالدهن)': M_RICE,
+  'سمسم': [U('ملعقة أكل',9,true), U('ملعقة شاي',3,false)], 'بذور شيا': [U('ملعقة أكل',12,true)], 'بذور كتان': [U('ملعقة أكل',10,true)],
+  'حب شمسي مقشر (بذور دوار الشمس)': M_NUTS.concat([U('ملعقة أكل',9,false)]), 'حب ركي (بذور بطيخ) مقشر': M_NUTS.concat([U('ملعقة أكل',9,false)]), 'كاجو': M_NUTS, 'فول سوداني محمص': M_NUTS, 'مكسرات مشكلة محمصة': M_NUTS,
+  'بروتين باودر (واي)': [U('سكوب',30,false), U('نص سكوب',15,false)], 'بروتين باودر نباتي': [U('سكوب',33,false), U('نص سكوب',16.5,false)],
   'عسل': [U('ملعقة أكل',21,true), U('ملعقة شاي',7,true)], 'طحينة': [U('ملعقة أكل',15,true)],
   'زبدة فول سوداني': [U('ملعقة أكل',16,true)], 'دبس تمر': [U('ملعقة أكل',20,false)], 'حمص بطحينة': [U('ملعقة أكل',15,true)],
   'معجون طماطة': [U('ملعقة أكل',16,true)], 'طحين أبيض': [U('كوب',125,true), U('ملعقة أكل',7.8,true)],
@@ -1885,7 +1933,9 @@ const SYNONYMS = {
   'قرنابيط':['زهره','قرنبيط','قرنبيت'], 'لهانه':['ملفوف','كرنب','لهانه'], 'شلغم':['لفت'], 'شوندر':['شمندر','بنجر','شونذر'],
   'رشاد':['جرجير'], 'بقدونس':['معدنوس','بقدنوس'], 'كزبره':['كزبره'], 'بصل اخضر':['بصل ورق','بصل اخضر'], 'ليمون':['حامض','نومي حامض','ليمونه'],
   'فاصوليا خضراء':['لوبيا خضراء','فاصوليا خضره'], 'باقلاء':['باقلا','فول'], 'سلق':['سلك'], 'قرع':['يقطين','شجر اصفر'], 'زيتون':['زيتونه'], 'طرشي':['مخلل','مخللات'], 'سلطه':['زلاطه','سلطه','صلطه'],
-  'رز':['تمن','ارز'], 'سمك':['سمج'], 'قريدس':['روبيان','جمبري'], 'دجاج':['جاج','فراخ','دياي'],
+  'رز':['تمن','ارز'], 'تمن':['رز','ارز'], 'طحينه':['راشي','رشي','طحينيه'], 'سمسم':['سمسم','جلجلان'], 'بروتين باودر':['بروتين','واي','whey','سكوب','بودره'],
+  'مكعب ماجي':['ماجي','مرقه','مرق مكعب','ماكي'], 'مقليه':['مقلي','قلي'], 'دهن حر':['سمن','دهن حيواني','دهن الحر'], 'زبده':['زبد'], 'حب شمسي':['حب','بذور','كرزات'], 'حب ركي':['حب','كرزات'], 'بذور':['حبوب','بزور'],
+  'مكسرات':['كرزات','نقل'], 'فول سوداني':['فستق عبيد','فستق','فول'], 'سمك':['سمج'], 'قريدس':['روبيان','جمبري'], 'دجاج':['جاج','فراخ','دياي'],
   'بيضه':['بيض'], 'بطاطا':['بتيته','بطاطس'], 'طماطه':['طماطم'], 'باذنجان':['بيتنجان','بتنجان'],
   'كوسا':['شجر','كوسه'], 'خياره':['خيار'], 'موزه':['موز'], 'تفاحه':['تفاح'], 'برتقاله':['برتقال'],
   'بزاليا':['بازلاء','بسله','بزاليه'], 'فاصوليا':['فاصوليه','لوبيا'], 'لحم':['لحمه','ذبيحه'], 'غنم':['غنمي','خروف'],
@@ -1910,7 +1960,8 @@ function populateFoodList(){
   SEARCH_INDEX = all.map(x=>{
     const base = normAr(x.name);
     let extra = [];
-    Object.keys(SYNONYMS).forEach(w=>{ if(base.includes(normAr(w))) extra = extra.concat(SYNONYMS[w].map(normAr)); });
+    const words = base.split(' '), hasW = k => k.includes(' ') ? base.includes(k) : words.some(x=>['','ال','بال','ب','و','ول'].some(pf=>x.startsWith(pf + k)));   // الكلمة لازم تبدي بيها (حتى «رز» ما يطلع بـ«كرزية»)
+    Object.keys(SYNONYMS).forEach(w=>{ if(hasW(normAr(w))) extra = extra.concat(SYNONYMS[w].map(normAr)); });
     return {...x, key: base, hay: base + ' ' + extra.join(' ')};
   });
 }
@@ -2050,7 +2101,14 @@ function computeCtx(c){
   return makeItem(name, f, amount, u);
 }
 function srcNote(src){ return src==='U' ? 'المصدر: USDA' : src==='E' ? '⚠️ قيمة تقديرية (تختلف حسب الطبخ)' : src==='C' ? 'من ملصق المنتج' : src==='R' ? 'من طبختك' : ''; }
+function dbPickVis(){
+  const v = document.getElementById('db-food').value, name = exactName(v), f = v.trim() ? findFood(name) : null, box = document.getElementById('db-pick');
+  if(!box) return;
+  if(f){ box.removeAttribute('data-off'); document.getElementById('db-picked').textContent = name; } else box.setAttribute('data-off', '');
+  const h = document.getElementById('db-hint'); if(h) h.hidden = !!f || !!(CTX.db.hits||[]).length;
+}
 function showFoodInfo(c){
+  if(c==='db') dbPickVis();
   const s = CTX[c], el = document.getElementById(s.preview);
   const it = computeCtx(c);
   if(!it){ el.textContent = s.idle; return; }
@@ -2063,6 +2121,7 @@ function clearCtx(c){
   document.getElementById(s.input).value=''; document.getElementById(s.amount).value='';
   s.hits = []; s.food = null; renderSearch(c); syncUnits(c);
   document.getElementById(s.preview).textContent = s.idle;
+  if(c==='db') dbPickVis();
 }
 
 // ================= items (snapshot values + a "ref" so amounts stay editable) =================
@@ -2126,7 +2185,7 @@ function renderDraft(){
 function setEditUI(){
   const card = document.getElementById('draft-card');
   card.classList.toggle('editing', !!mode);
-  let title = 'الوجبة الحالية', save = 'حفظ الوجبة';
+  let title = 'ضيف أكل', save = 'حفظ الوجبة';
   if(mode && mode.type==='meal'){ title = `تعديل وجبة <span class="pill">${esc(dayName(mode.key))}</span>`; save = 'حفظ التعديل'; }
   if(mode && mode.type==='saved'){ title = 'تعديل وجبة جاهزة'; save = 'حفظ الوجبة الجاهزة'; }
   document.getElementById('draft-title').innerHTML = title;
@@ -3530,6 +3589,7 @@ const EXLIB = {
   climber: XE('متسلق الجبل', ['abs'], ['obliques','deltFront','quads'], [], 'time', {av:['wrist'], cue:'بوضعية الضغط وإيديك تحت كتافك. قرّب ركبة لصدرك وبدّل بسرعة ثابتة، ووركك ما يرتفع.'}),
   // ---- أجهزة كارديو
   elliptical: XE('جهاز الإليبتكال (أوربتراك)', ['quads','glutes'], ['hamstrings','calves','deltFront'], ['elliptical'], 'cardio', {met:5.0, set:'مقاومة متوسطة · 50-60 دورة بالدقيقة', cue:'اوكف مستقيم وحرك إيديك ويا رجلك. ما يضغط على الركبة مثل الركض. شدة متوسطة: تكدر تحچي بس ما تكدر تغني.'}),
+  rower: XE('جهاز التجذيف (روينغ)', ['quads','glutes','lats'], ['hamstrings','traps','biceps','erectors','calves'], ['rower'], 'cardio', {met:6.0, av:['lowback'], set:'شدة متوسطة · 22-26 سحبة بالدقيقة', cue:'السحبة: ادفع برجلك أول، بعدين ميّل ظهرك شوية لورا، وآخر شي اسحب المقبض لأسفل صدرك. الرجعة بالعكس: إيدك، بعدين جسمك، بعدين رجلك. ظهرك مستقيم وما تحدّب.'}),
   stairs: XE('جهاز الدرج (ستيرماستر)', ['glutes','quads'], ['calves','hamstrings'], ['stairs'], 'cardio', {met:9.0, av:['knee'], set:'سرعة هادئة · خطوات كاملة', cue:'اصعد بكامل القدم وجسمك مستقيم، ولا تتكى على الحواجز. ابدي بسرعة هادئة، لأنه أتعب من المشي.'})
 };
 const TR_ISO = new Set(['quadIso','hamIso','calf','fly','latraise','rear','biceps','triceps','core','backext','abd']);
@@ -3580,10 +3640,10 @@ const CARDIO_GOAL = {cut:{n:4, m:{beg:20, int:25, adv:30}}, recomp:{n:3, m:{beg:
 // (المبتدئ أقل، والمتوسط والمتقدم 10-20 جولة للعضلة، Schoenfeld 2017) مقسومة على أيام التمرين، ويا حد أعلى للحصة
 const TR_GEN_V = 2; // نسخة صانع البرامج: البرامج الأقدم ينعرض لها تحديث
 const WEEK_W = {beg:135, int:190, adv:240}, W_RANGE = {beg:[30,55], int:[45,65], adv:[50,70]}, SESSION_MAX = {beg:70, int:80, adv:90};
-function trAvail(st){ return st.place==='gym' ? ['bb','db','machine','cable','bar','band','bench','chair','treadmill','bike','elliptical','stairs'] : ['chair','table'].concat((st.equip||[]).filter(x=>TR_EQUIP_HOME.includes(x))); }
+function trAvail(st){ return st.place==='gym' ? ['bb','db','machine','cable','bar','band','bench','chair','treadmill','bike','elliptical','stairs','rower'] : ['chair','table'].concat((st.equip||[]).filter(x=>TR_EQUIP_HOME.includes(x))); }
 // نوع التمرين: جهاز/كيبل، أوزان حرة، أو وزن الجسم
-function trKind(id){ const r = (EXLIB[id]||{}).req||[]; if(r.some(x=>['machine','cable','treadmill','bike','elliptical','stairs'].includes(x))) return 'machine'; if(r.includes('bb')||r.includes('db')) return 'free'; return 'bw'; }
-function trKindLabel(id){ const r = (EXLIB[id]||{}).req||[]; return r.includes('cable') ? 'كيبل' : r.some(x=>['machine','treadmill','bike','elliptical','stairs'].includes(x)) ? 'جهاز' : r.includes('bb') ? 'بار' : r.includes('db') ? 'دمبل' : r.includes('band') ? 'مطاط' : r.includes('bar') ? 'عقلة' : 'وزن الجسم'; }
+function trKind(id){ const r = (EXLIB[id]||{}).req||[]; if(r.some(x=>['machine','cable','treadmill','bike','elliptical','stairs','rower'].includes(x))) return 'machine'; if(r.includes('bb')||r.includes('db')) return 'free'; return 'bw'; }
+function trKindLabel(id){ const r = (EXLIB[id]||{}).req||[]; return r.includes('cable') ? 'كيبل' : r.some(x=>['machine','treadmill','bike','elliptical','stairs','rower'].includes(x)) ? 'جهاز' : r.includes('bb') ? 'بار' : r.includes('db') ? 'دمبل' : r.includes('band') ? 'مطاط' : r.includes('bar') ? 'عقلة' : 'وزن الجسم'; }
 function trCardioPlan(st){
   const g = CARDIO_GOAL[st.goal] ? st.goal : 'maintain', c = CARDIO_GOAL[g], lv = c.m[st.level] ? st.level : 'beg';
   const days = [2,3,4,5,6].includes(num(st.days)) ? num(st.days) : 3, count = Math.min(c.n, days);
@@ -3907,7 +3967,7 @@ function trSetLink(v){
 
 // ---------- ورقة التمرين (بوتوم شيت) ----------
 /* ============ v75: رأيك يهمنا (يوصل برسالة انستغرام) ============ */
-const HERO_VER = '75', FB_IG = 'hurr88';
+const HERO_VER = '76', FB_IG = 'hurr88';
 function fbOpen(type){
   let draft = ''; try{ draft = localStorage.getItem('hero_fb') || ''; }catch(e){}
   const t = type || 'idea';
@@ -3987,7 +4047,7 @@ function trRenderGen(){
     ${home ? '' : `<div class="opt-group"><span class="opt-label">المكائن أو الأوزان الحرة؟</span><div class="opt-help">المكائن أسهل بالتعلم وأأمن للمبتدئ بدون مدرب، والنتيجة بالعضل تقريباً نفسها. الأوزان الحرة تبني قوة وتوازن أكثر. وأي تمرين تكدر تبدّله إذا الجهاز مشغول.</div>${trOptBtns('style', [['machine','مكائن أكثر'],['mix','مزيج'],['free','أوزان حرة أكثر']])}</div>`}
     <div class="opt-group"><span class="opt-label">التركيز</span>${trOptBtns('focus', [['bal','متوازن'],['lower','الجزء السفلي والأرداف'],['upper','الجزء العلوي']])}</div>
     <div class="opt-group"><span class="opt-label">الكارديو</span><div class="goal-note" style="margin-top:0;">${esc(trCardioText(g))}</div></div>
-    <div class="opt-group"><span class="opt-label">نوع الكارديو</span>${trOptBtns('cardioType', home ? [['auto','تلقائي'],['walk','مشي سريع'],['march','مشي بالمكان'],['jacks','قفز جانبي']] : [['auto','تلقائي'],['tread','تردمل بميلان'],['elliptical','إليبتكال'],['bike','دراجة'],['stairs','جهاز الدرج']])}</div>
+    <div class="opt-group"><span class="opt-label">نوع الكارديو</span>${trOptBtns('cardioType', home ? [['auto','تلقائي'],['walk','مشي سريع'],['march','مشي بالمكان'],['jacks','قفز جانبي']] : [['auto','تلقائي'],['tread','تردمل بميلان'],['elliptical','إليبتكال'],['bike','دراجة'],['rower','تجذيف (روينغ)'],['stairs','جهاز الدرج']])}</div>
     <div class="opt-group"><span class="opt-label">أتجنب (إصابة أو ألم)</span><div class="opt-help">نشيل التمارين اللي تضغط على هذي المنطقة. الإصابة تحتاج رأي طبيب أو معالج.</div>${trOptBtns('avoid', TR_AVOIDS, true)}</div>
     <div class="card" style="margin:0 0 12px; background:var(--accent-soft); border-color:transparent;"><div style="font-weight:700; margin-bottom:4px;">مدة الحصة</div>
       <div class="goal-note" style="margin:0;">${esc(trTimeText(g))} حسبناها حتى كل عضلة تتمرن مرتين بالأسبوع وتاخذ عدد الجولات المناسب لمستواك، بدون ما تطول الحصة أكثر من اللازم.</div></div>
@@ -4423,7 +4483,7 @@ function cleanTrSettings(s){
     level:['beg','int','adv'].includes(s.level) ? s.level : 'beg', focus:['bal','lower','upper'].includes(s.focus) ? s.focus : 'bal',
     style:['machine','mix','free'].includes(s.style) ? s.style : 'mix', cardioMode: s.cardioMode==='auto' ? 'auto' : 'manual', goal: CARDIO_GOAL[s.goal] ? s.goal : 'maintain',
     cardio:trClampInt(s.cardio,0,4,0), cardioMin:[10,15,20,25,30].includes(num(s.cardioMin)) ? num(s.cardioMin) : 20,
-    cardioType:['auto','tread','bike','elliptical','stairs','walk','march','jacks'].includes(s.cardioType) ? s.cardioType : 'auto',
+    cardioType:['auto','tread','bike','elliptical','stairs','rower','walk','march','jacks'].includes(s.cardioType) ? s.cardioType : 'auto',
     avoid:(Array.isArray(s.avoid)?s.avoid:[]).filter(x=>TR_AVOIDS.some(a=>a[0]===x))};
 }
 function cleanSetLog(a, type){
@@ -5320,6 +5380,21 @@ window.Coach3D = (function () {
     b.hpiv = piv; b.eth = th;
     return Object.assign(b, { p: ((th / (2 * Math.PI)) % 1 + 1) % 1, legs: [legAt(pA), legAt(pB)], arms: [handAt(th + Math.PI), handAt(th)] });
   };
+  // جهاز التجذيف: السحبة (40%) رجلين ← ظهر ← إيدين، والرجعة (60%) بالعكس: إيدين ← ظهر ← رجلين. الكاحل ثابت على الدوّاسة المايلة والمقعد يزحلق على السكة
+  const ERG = { ax: 128, ay: FY - 23, sy: FY - 33, fan: [172, FY - 42], per: 2.6 };
+  M.erg = (B, t, P) => {
+    const { ax, ay, sy, fan, per } = ERG, u = ((t / per) % 1 + 1) % 1, ss = smoothstep;
+    let Lg, K, A;
+    if (u < 0.4) { const d = u / 0.4; Lg = ss(0, 0.62, d); K = ss(0.28, 0.82, d); A = ss(0.55, 1, d); }
+    else { const r = (u - 0.4) / 0.6; A = 1 - ss(0, 0.3, r); K = 1 - ss(0.12, 0.5, r); Lg = 1 - ss(0.38, 1, r); }
+    const LL = B.thigh + B.shin, dy = ay - sy, f = lerp(0.52, 0.985, Lg) * LL, hip = [ax - Math.sqrt(Math.max(1, f * f - dy * dy)), sy];
+    const b = body(hip, lerp(-60, -110, K), B, lerp(-74, -98, K));
+    const leg = legIK(hip, [ax, ay], dirv(-40), B, -1);
+    const g = 2, reachP = add(b.sh, mul(unit(sub(fan, b.sh)), REACH(B) * 0.975 + g)), rib = chestPt(b, B, 0.42 * B.torso, 3.5);
+    const h = lerpP(reachP, rib, A), hint = lerpP(add(lerpP(b.sh, h, 0.5), [0, 9]), at(b.sh, b.T, b.F, -14, -12), A);
+    const arm = gripArm(b.sh, h, B, g, hint, 1);
+    return Object.assign(b, { p: u < 0.4 ? u / 0.4 : 1 - (u - 0.4) / 0.6, legs: [leg, leg], arms: [arm, arm], ergH: h });
+  };
   const STAIR = { h: 14, d: 18, yTop: FY - 44, xTop: 106, per: 1.5 };
   M.stairs = (B, t, P) => {
     const { h, d, yTop, xTop, per } = STAIR, s = 2 * t / per, ph = ((t / per) % 1 + 1) % 1;
@@ -5420,6 +5495,7 @@ window.Coach3D = (function () {
     rev_crunch: { m: 'revcrunch', P: {}, lat: (p, D) => ({ ankle: D.hw + 1, knee: .1, toe: 0, wrist: D.sw + 2, flare: .1 }), flat: true, equip: ['mat'], yaw: -62 },
     climber: { m: 'climber', P: {}, lat: (p, D) => ({ ankle: D.hw - 0.5, knee: .12, toe: 0, wrist: D.sw + 4, flare: .75 }), flat: true, equip: ['mat'], yaw: -62 },
     elliptical: { m: 'ellip', P: {}, lat: (p, D) => ({ ankle: D.hw + 2.5, knee: .15, toe: 3, wrist: D.sw + 1, flare: .25 }), equip: ['elliptical'], yaw: -55 },
+    rower: { m: 'erg', P: {}, lat: (p, D) => ({ ankle: D.hw + 2.2, knee: .3, toe: 6, wrist: D.sw + 0.5, flare: .4 }), equip: ['erg'], yaw: -62 },
     stairs: { m: 'stairs', P: {}, lat: (p, D) => ({ ankle: D.hw + 1.5, knee: .1, toe: 5, wrist: D.sw + 6, flare: .3 }), equip: ['stairs'], yaw: -55 }
   };
 
@@ -5429,7 +5505,7 @@ window.Coach3D = (function () {
   const HAND = { cableAnkle: 'pro',
     bar: 'pro', dbX: 'pro', dbZ: 'neu', dbH: 'ham', smith: 'pro', pullbar: 'pro', pulldown: 'pro', cableHigh: 'pro', cableCurl: 'sup',
     chestpress: 'vert', smp: 'pro', rowmachine: 'vert', pecdeck: 'vert', revpec: 'vert', cableLow: 'vert', bandFront: 'vert', bandTop: 'pro', bandFeet: 'neu',
-    cableFace: 'vert', cableKneel: 'vert', abmach: 'vert', table: 'pro', bike: 'pro', elliptical: 'vert', treadmill: 'rel', stairs: 'vert'
+    cableFace: 'vert', cableKneel: 'vert', abmach: 'vert', table: 'pro', bike: 'pro', elliptical: 'vert', treadmill: 'rel', stairs: 'vert', erg: 'pro'
   };
   const HAND_EX = {   // تمارين إلها مسكة خاصة
     bb_curl: 'sup', db_curl: 'sup', band_curl: 'sup', cable_curl: 'sup', goblet: 'cup', oh_tri: 'cup', db_fly: 'neuT',
@@ -5439,9 +5515,9 @@ window.Coach3D = (function () {
     hip_abd: 'side', hip_add: 'side', kickback: 'pro', captain_chair: 'vert', hanging_knee: 'pro', band_lat_raise: 'neu'
   };
   const HOFF = { cableAnkle: 2, bar: 2, smith: 2, dbX: 2.8, dbZ: 2.8, dbH: 2.8, dbV: null, pullbar: 2, pulldown: 0, cableHigh: 2.5, cableLow: 0, cableCurl: 2.5, chestpress: 2.5, smp: 2.5,
-    rowmachine: 2.5, pecdeck: 2.5, revpec: 2.5, bandFront: 2.5, bandTop: 2.5, bandFeet: 2.5, cableFace: 2, cableKneel: 2, abmach: 2.5, table: 2, elliptical: 0, bike: 1, stairs: 0, legext: 0, captain: 0, abmach: 0 };
+    rowmachine: 2.5, pecdeck: 2.5, revpec: 2.5, bandFront: 2.5, bandTop: 2.5, bandFeet: 2.5, cableFace: 2, cableKneel: 2, abmach: 2.5, table: 2, elliptical: 0, bike: 1, stairs: 0, erg: 2, legext: 0, captain: 0, abmach: 0 };
   // نص قطر المقبض (وحدة المحرك): البار والدمبل رفيعين، المقابض المطاط أعرض
-  const GR = { elliptical: 1.9, stairs: 1.9, captain: 1.6, legext: 1.6, legpress: 1.6, abductor: 1.4, adductor: 1.4, bike: 1.7, cableLow: 1.6, abmach: 1.6 };
+  const GR = { erg: 1.6, elliptical: 1.9, stairs: 1.9, captain: 1.6, legext: 1.6, legpress: 1.6, abductor: 1.4, adductor: 1.4, bike: 1.7, cableLow: 1.6, abmach: 1.6 };
   function handSpec(exId) {
     const ex = EX[exId], eq = ex.equip || [], V3 = THREE.Vector3;
     const e0 = eq.find(e => HAND[e]), kind = HAND_EX[exId] || (e0 && HAND[e0]) || 'rel', g = e0 && HOFF[e0] != null ? HOFF[e0] : null, gr = (e0 && GR[e0]) || (eq.find(e => GR[e]) && GR[eq.find(e => GR[e])]) || 1.1;
@@ -6379,6 +6455,38 @@ window.Coach3D = (function () {
           return gr;
         });
         ups.push(J => { const s = J.Mo.stairS, k0 = Math.floor(s) - 4; steps.forEach((m, j) => { const u = s - (k0 + j), yT = yTop + h * Math.max(0, u), xF = xTop - d * u; m.visible = u > -1.2 && u < 3.3 && yT < FY - 1; m.position.copy(v3([xF - d / 2, yT + h / 2], 0)); }); });
+      } else if (e === 'erg') {
+        // جهاز تجذيف بستايل الصالات: سكة وحدة طويلة على رجلين، مقعد يزحلق، دوّاسات مايلة بأحزمة، حاضنة مروحة قدّام، سلسلة للمقبض، وشاشة على ذراع
+        const an0 = J0.legs.map(l => l.an), sole = J0.legs[0].sole, zA = (an0[0].z + an0[1].z) / 2, yA = (an0[0].y + an0[1].y) / 2;
+        const fan = v3(ERG.fan, 0), zR0 = J0.pelvis.z - 70, yR = 19;
+        const rail = box(9, 4, fan.z - zR0 - 6, MAT.frame); rail.position.set(0, yR, (fan.z + zR0) / 2 - 3);
+        const rtop = box(6, 0.6, fan.z - zR0 - 14, MAT.steel); rtop.position.set(0, yR + 2.3, (fan.z + zR0) / 2 - 7);
+        const rl = box(6, yR - 2, 5, MAT.frame); rl.position.set(0, yR / 2, zR0 + 4); const rf = box(46, 3, 7, MAT.frame); rf.position.set(0, 1.5, zR0 + 4);
+        for (const sx of [-1, 1]) { const ft = box(7, 2, 9, MAT.rubber); ft.position.set(sx * 21, 1, zR0 + 4); }
+        const ff = box(54, 3, 8, MAT.frame); ff.position.set(0, 1.5, fan.z + 4); for (const sx of [-1, 1]) { const ft = box(7, 2, 10, MAT.rubber); ft.position.set(sx * 25, 1, fan.z + 4); }
+        rod(new V3(0, 2, fan.z + 4), new V3(0, yR, fan.z - 10), 3, MAT.frame);
+        const hs = cyl(19, 14, MAT.shroud, 40); hs.rotation.z = Math.PI / 2; hs.position.set(0, fan.y, fan.z + 4);
+        for (const sx of [-1, 1]) { const cap = cyl(15, 1, MAT.deck, 36); cap.rotation.z = Math.PI / 2; cap.position.set(sx * 7.3, fan.y, fan.z + 4); }
+        const dmp = box(3, 6, 3, MAT.rubber); dmp.position.set(7.8, fan.y + 8, fan.z + 4);
+        const exitP = new V3(0, fan.y + 2, fan.z - 13); const mouth = box(8, 5, 4, MAT.deck); mouth.position.copy(exitP);
+        // دوّاسات مايلة تحت الرجلين، وحزام فوك مشط القدم
+        const s2 = new V3(0, sole.y, sole.z).normalize(), nn = new V3(0, s2.z, -s2.y); if (nn.y > 0) nn.negate();
+        for (let i = 0; i < 2; i++) {
+          const sx = i ? -1 : 1, c = J0.legs[i].an.clone().addScaledVector(s2, 5).addScaledVector(nn, rig.B.ankleH + 1.3); c.x = sx * Math.max(6.5, Math.abs(c.x));
+          const pl = box(11, 1.6, 27, MAT.deck); pl.position.copy(c); pl.quaternion.setFromUnitVectors(new V3(0, 0, 1), s2);
+          const st = box(12, 0.8, 5, MAT.rubber); st.position.copy(c).addScaledVector(s2, 6).addScaledVector(nn, -(rig.B.ankleH + 4.2)); st.quaternion.copy(pl.quaternion);
+          rod(c.clone().addScaledVector(nn, 1.5).setX(sx * 2), new V3(sx * 2, yR, c.z + 4), 1.6, MAT.frame);
+        }
+        rod(new V3(0, fan.y + 16, fan.z + 2), new V3(0, fan.y + 40, fan.z - 12), 1.4, MAT.frame);
+        const mon = box(17, 13, 3, MAT.deck); mon.position.set(0, fan.y + 44, fan.z - 14); mon.rotation.x = -0.35;
+        const scr = box(12, 8, 0.6, MAT.rubber); scr.position.set(0, fan.y + 44.3, fan.z - 15.6); scr.rotation.x = -0.35;
+        const seat = box(24, 4, 26, MAT.pad), car = box(16, 3, 18, MAT.shroud), handle = rod(new V3(), new V3(0, 1, 0), 1.6, MAT.rubber), hbar = rod(new V3(), new V3(0, 1, 0), 1.0, MAT.frame), chain = rod(new V3(), new V3(0, 1, 0), 0.4, MAT.cable);
+        ups.push(J => {
+          seat.position.set(0, Math.max(yR + 5, J.pelvis.y - 8), J.pelvis.z + 1); car.position.set(0, seat.position.y - 3.4, seat.position.z);
+          const w = J.arms.map((a, i) => fistAt(J, i, 1.6).c), c = w[0].clone().add(w[1]).multiplyScalar(0.5);
+          handle.userData.set(w[1].clone().setX(w[1].x - 5), w[0].clone().setX(w[0].x + 5)); hbar.userData.set(w[1].clone().setX(Math.min(w[1].x, -4)), w[0].clone().setX(Math.max(w[0].x, 4)));
+          chain.userData.set(c, exitP);
+        });
       } else if (e === 'elliptical') {
         // كروس ترينر بالدفع الخلفي (ستايل الجيم): حاضنة الفلاي ويل ورا، ذراعين الدواسات لقدّام على سكة، عمود قدّامي بشاشة، والمقابض المتحركة تتمرجح حول محور بالعمود
         const cz = -44, cy = 24, cr = 10, C3 = new V3(0, cy, cz), zF = 58;
