@@ -722,6 +722,14 @@ h2, .ach-h h3, .pl-name, .about-name{font-family:var(--f-display); font-weight:8
 .lib-or .lib-links button .ic{font-size:16px;}
 .lib-or .lib-links button small{display:none;}
 .draft-h{display:flex; align-items:center; gap:8px; font-weight:800; font-size:15px; margin-bottom:8px;}
+
+/* ============ v80: تنبيه الإصلاح ============ */
+.fix-note{text-align:center; display:flex; flex-direction:column; gap:8px; padding:4px 4px 8px;}
+.fix-note .big{font-size:52px; line-height:1.1;}
+.fix-note h3{margin:0; font-family:var(--f-display); font-weight:800; font-size:21px;}
+.fix-note p{margin:0; font-size:15px; line-height:1.7;}
+.fix-note p.sub{font-size:13px; color:var(--sub);}
+.fix-note button{margin-top:8px;}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
@@ -936,7 +944,7 @@ h2, .ach-h h3, .pl-name, .about-name{font-family:var(--f-display); font-weight:8
       <div class="about-line">صُنع في العراق 🇮🇶</div>
       <div class="about-name">حر العبدلي</div>
       <div class="about-sub"><span dir="ltr">@hurr88</span></div>
-      <div class="about-sub" style="opacity:.6">نسخة تجريبية 79</div>
+      <div class="about-sub" style="opacity:.6">نسخة تجريبية 80</div>
       <div class="about-motto" dir="ltr">BE YOUR OWN HERO</div>
     </div>
 
@@ -4015,7 +4023,7 @@ function trSetLink(v){
 
 // ---------- ورقة التمرين (بوتوم شيت) ----------
 /* ============ v75: رأيك يهمنا (يوصل برسالة انستغرام) ============ */
-const HERO_VER = '79', FB_IG = 'hurr88';
+const HERO_VER = '80', FB_IG = 'hurr88';
 function fbOpen(type){
   let draft = ''; try{ draft = localStorage.getItem('hero_fb') || ''; }catch(e){}
   const t = type || 'idea';
@@ -4035,7 +4043,8 @@ function fbMsg(){
   const tp = (document.querySelector('input[name="fb-type"]:checked') || {}).value || 'idea';
   const TL = {bug:'🐞 مشكلة', idea:'💡 اقتراح', like:'❤️ عجبني'};
   const ua = navigator.userAgent || '', dev = /iPhone|iPad/.test(ua) ? 'آيفون' : /Android/.test(ua) ? 'أندرويد' : 'كمبيوتر';
-  return {tx, text: `رأيي بتطبيق هيرو (${TL[tp]})\n\n${tx}\n\n— نسخة ${HERO_VER} · ${dev}`};
+  let lite = ''; try { const L = JSON.parse(localStorage.getItem('hero_3d_lite') || 'null'); if(L) lite = ` · مدرب خفيف (${L.gpu || '?'})`; }catch(e){}
+  return {tx, text: `رأيي بتطبيق هيرو (${TL[tp]})\n\n${tx}\n\n— نسخة ${HERO_VER} · ${dev}${lite}`};
 }
 function fbCopy(text){
   let ok = false;
@@ -4591,7 +4600,13 @@ window.__startedWithoutProfile = !data.profile;
 if(!data.profile) switchTab('profile');
 setCloudStatus('checking');
 renderAchChip();
-Promise.race([initCloud(), new Promise(r=>setTimeout(r, 4000))]).then(()=>{ if(!data.onboarded) openOnboard(); achSoon(); });
+function fixNotice(){
+  const K = 'hero_notice_ffix1'; let seen = false; try{ seen = !!localStorage.getItem(K); }catch(e){}
+  if(seen || !data.profile || data.profile.sex !== 'f') return;
+  try{ localStorage.setItem(K, '1'); }catch(e){}
+  trOpenSheet('تحديث هيرو 🛠️', `<div class="fix-note"><div class="big">🦸‍♀️</div><h3>نعتذر عن الخلل</h3><p>تم إصلاح كابتن هيرو البنت. هسه تطلع كاملة بصفحة التمرين.</p><p class="sub">إذا بعدها ما تطلع صح عندچ، دزيلنا من «ملفي ← رأيك يهمنا» 💬</p><button class="primary" onclick="trCloseSheet()">تمام</button></div>`);
+}
+Promise.race([initCloud(), new Promise(r=>setTimeout(r, 4000))]).then(()=>{ if(!data.onboarded) openOnboard(); else setTimeout(fixNotice, 2600); achSoon(); });
 </script>
 <script>
 /* ============ عافية · محرك المدرب ثلاثي الأبعاد (نموذج مؤقت) ============
@@ -5609,6 +5624,52 @@ window.Coach3D = (function () {
     return FIGP[sex];
   }
   function has(id) { return !!EX[id]; }
+  const GLERR = [];
+  function gpuName(gl) { try { const x = gl.getExtension('WEBGL_debug_renderer_info'); return String(x ? gl.getParameter(x.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)).slice(0, 80); } catch (e) { return ''; } }
+  // فحص بعد أول كم إطار: نقارن بكسلات مكان الجسم وياه وبدونه. إذا ما تغير شي، الجسم ما انرسم بهذا الجهاز (مثل الشاشة اللي بيها بس حذاء وعيون)، فنحوّل لنسخة خفيفة تنرسم بكل الأجهزة
+  function visCheck() {
+    const rig = S.rig, B = rig.mh.B, gl = S.renderer.getContext(), W = gl.drawingBufferWidth, H = gl.drawingBufferHeight, bn = B.byName || {};
+    const names = ['spine05', 'spine03', 'spine01', 'neck01', 'upperleg02.L', 'upperleg02.R', 'lowerleg01.L', 'lowerleg01.R', 'upperarm02.L', 'upperarm02.R', 'pelvis.L', 'pelvis.R'];
+    const pts = names.filter(n => bn[n]).map(n => { const v = bn[n].getWorldPosition(new THREE.Vector3()).project(S.camera); return [Math.round((v.x * 0.5 + 0.5) * W), Math.round((v.y * 0.5 + 0.5) * H)]; })
+      .filter(([x, y]) => x >= 0 && y >= 0 && x < W && y < H);
+    if (pts.length < 3 || W < 50 || H < 50) return false;
+    const px = new Uint8Array(4), read = () => pts.map(([x, y]) => { gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); return Array.from(px); });
+    const a = read(), meshes = [B.mesh, B.mus && B.mus.mesh].filter(Boolean), was = meshes.map(m => m.visible);
+    meshes.forEach(m => m.visible = false); S.renderer.render(S.scene, S.camera); const b = read();
+    meshes.forEach((m, i) => m.visible = was[i]);
+    const diff = a.filter((c, i) => Math.abs(c[0] - b[i][0]) + Math.abs(c[1] - b[i][1]) + Math.abs(c[2] - b[i][2]) + Math.abs(c[3] - b[i][3]) > 12).length;
+    S.renderer.render(S.scene, S.camera);
+    if (diff === 0) liteBody(gl);
+    return true;
+  }
+  function liteBody(gl) {
+    const fig = S.rig.mh, B = fig.B; if (fig.lite) return;
+    // ألوان بسيطة لكل منطقة (بشرة، شعر، بلوزة/تيشيرت، ليغنز/شورت) من نفس ألوان النسخة الكاملة
+    const LU = (B.layer && B.layer.userData && B.layer.userData.U) || {}, C = (u, d) => (u && u.value && u.value.isColor) ? u.value.clone() : new THREE.Color(d);
+    const skin = C(LU.uSkin, 0xe9bfa0), hair = C(LU.uHair, 0x3a2a22), top = C(LU.uTop, 0x1d4ea3), bot = C(LU.uBottom, 0x1f2633), shoe = new THREE.Color(0x22252b), fem = fig.sex === 'f';
+    try {
+      const g = B.mesh.geometry, P = g.attributes.position, Z = g.attributes.aZone, eye = (B.lm && B.lm.eye) || [0, 160, 8], n = P.count, cols = new Float32Array(n * 3);
+      let yHip = 0, yKnee = 0; for (let i = 0; i < n; i++) { if (Z && Z.getX(i) > 0.5) yHip = Math.max(yHip, P.getY(i)); } yKnee = yHip * 0.55;
+      for (let i = 0; i < n; i++) {
+        const y = P.getY(i), z = P.getZ(i), legs = Z ? Z.getX(i) : 0, arm = Z ? Z.getY(i) : 0, head = Z ? Z.getZ(i) : 0, foot = Z ? Z.getW(i) : 0;
+        let c = skin;
+        if (foot > 0.4 || (legs > 0.5 && y < 9)) c = shoe;
+        else if (head > 0.4) c = (y > eye[1] + 3 || (z < eye[2] - 7 && y > eye[1] - 6)) ? hair : skin;
+        else if (legs > 0.5) c = fem ? (y > 12 ? bot : skin) : (y > yKnee ? bot : skin);
+        else if (arm > 0.35) c = fem ? top : (y > eye[1] - 40 ? top : skin);
+        else c = top;
+        cols[i * 3] = c.r; cols[i * 3 + 1] = c.g; cols[i * 3 + 2] = c.b;
+      }
+      g.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+      B.mesh.material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.66 });
+    } catch (e) { B.mesh.material = new THREE.MeshStandardMaterial({ color: skin, roughness: 0.62 }); }
+    B.mesh.customDepthMaterial = undefined;
+    if (B.mus && B.mus.mesh) B.mus.mesh.visible = false;
+    const sc = fig.setClothes; fig.setClothes = v => { sc(v); if (B.mus && B.mus.mesh) B.mus.mesh.visible = false; };
+    fig.lite = true;
+    try { localStorage.setItem('hero_3d_lite', JSON.stringify({ gpu: gpuName(gl), err: GLERR.slice(-2).join(' | ').slice(0, 300), at: Date.now() })); } catch (e) {}
+    S.renderer.render(S.scene, S.camera);
+  }
 
   function setup(canvas, stage) {
     const V3 = THREE.Vector3;
@@ -5616,6 +5677,9 @@ window.Coach3D = (function () {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
     renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.debug.onShaderError = (gl, prog, vs, fs) => {   // نسجل خطأ الشيدر (يفيدنا إذا جهاز ما يرسم الجسم)
+      try { GLERR.push(((gl.getShaderInfoLog(vs) || '') + ' ' + (gl.getShaderInfoLog(fs) || '') + ' ' + (gl.getProgramInfoLog(prog) || '')).trim().slice(0, 300)); } catch (e) {}
+    };
     const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(30, 1, 5, 4000);
     const hemi = new THREE.HemisphereLight(0xffffff, 0xb4bccb, 1.15); scene.add(hemi);
     const key = new THREE.DirectionalLight(0xffffff, 1.7); key.position.set(90, 220, 140); key.castShadow = true;
@@ -6635,6 +6699,7 @@ window.Coach3D = (function () {
     const d = S.fit.dist * S.cam.zoom, tg = S.fit.target, c = S.cam;
     S.camera.position.set(tg.x + d * Math.cos(c.pitch) * Math.sin(c.yaw), tg.y + d * Math.sin(c.pitch), tg.z + d * Math.cos(c.pitch) * Math.cos(c.yaw));
     S.camera.lookAt(tg); S.renderer.render(S.scene, S.camera);
+    if (S.rig && S.rig.mh && !S.rig.mh.lite && !S.rig.visDone && (S.rig.visN = (S.rig.visN || 0) + 1) >= 6) { try { if (visCheck() !== false) S.rig.visDone = true; } catch (e) { S.rig.visDone = true; console.warn('visCheck', e); } }
     if (S.onFrame) { const f = S.onFrame; S.onFrame = null; f(); }
   }
   async function mount(canvas, stage, opts) {
@@ -6650,7 +6715,7 @@ window.Coach3D = (function () {
   function resume() { if (S && !S.running) { S.running = true; S.last = performance.now(); requestAnimationFrame(frame); } }
   return {
     load, mount, show, setView, stop, resume, has, resize,
-    setClothes: v => { if (S) { S.clothes = !!v; if (S.rig && S.rig.mh) S.rig.mh.setClothes(S.clothes); } }, hasBody: () => !!(S && S.rig && S.rig.mh),
+    setClothes: v => { if (S) { S.clothes = !!v; if (S.rig && S.rig.mh) S.rig.mh.setClothes(S.clothes); } }, hasBody: () => !!(S && S.rig && S.rig.mh), isLite: () => !!(S && S.rig && S.rig.mh && S.rig.mh.lite), _liteBody: () => { if (S && S.rig && S.rig.mh) liteBody(S.renderer.getContext()); },
     setSpeed: v => { if (S) S.speed = v; }, setPlaying: v => { if (S) S.playing = v; }, setSpin: v => { if (S) { S.spin = v; if (v) S.cam.easing = false; } },
     _debug: () => S, _three: () => THREE, _setT: t => { if (S) S.t = t; }, ids: () => Object.keys(EX), _solve: (id, t) => solve(id, S.rig, t), _pose: J => applyPose(S.rig, J), _int: () => ({ M, LM, comX, SQC, OHPC, ROWC, facePts, legFront, clearX, tempo, TEMPO, EX, bodyPush, dbPoints, dbAxis }),
     _render: () => { if (!S) return; const was = S.running; S.running = true; S.last = performance.now(); frame(S.last); S.running = was; }
