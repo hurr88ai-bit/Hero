@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
+<!-- هيرو · HERO — © 2026 حُرّ العبدلي (Hurr Alabdali). جميع الحقوق محفوظة. All rights reserved. -->
+<meta name="author" content="حُرّ العبدلي · Hurr Alabdali">
+<meta name="copyright" content="© 2026 Hurr Alabdali. All rights reserved.">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>هيرو</title>
@@ -730,6 +733,33 @@ h2, .ach-h h3, .pl-name, .about-name{font-family:var(--f-display); font-weight:8
 .fix-note p{margin:0; font-size:15px; line-height:1.7;}
 .fix-note p.sub{font-size:13px; color:var(--sub);}
 .fix-note button{margin-top:8px;}
+
+/* ============ v81: تنزيل هيرو على الشاشة ============ */
+.inst{display:flex; flex-direction:column; gap:12px; padding:2px 2px 8px;}
+.inst .inst-lead{margin:0; font-size:15px; line-height:1.75;}
+.inst .inst-why{margin:0; font-size:13px; line-height:1.7; color:var(--sub);}
+.inst ol{margin:0; padding:0; list-style:none; counter-reset:st; display:flex; flex-direction:column; gap:10px;}
+.inst ol li{counter-increment:st; display:flex; align-items:center; gap:12px; background:var(--card-2); border-radius:14px; padding:12px 14px; font-size:15px; line-height:1.6;}
+.inst ol li::before{content:counter(st); flex:0 0 30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#13233f; color:#ffcf4a; font:800 15px var(--f-display);}
+.inst ol li b{font-weight:800;}
+.inst .inst-ic{display:inline-flex; vertical-align:-5px; width:22px; height:22px; color:#1d7bf2;}
+.inst .inst-ic svg{width:22px; height:22px;}
+.inst .inst-btn{display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:14px; border-radius:14px; border:0; background:#13233f; color:#ffcf4a; font:800 16px var(--f-display); text-decoration:none; cursor:pointer;}
+.inst .inst-btn.alt{background:var(--card-2); color:var(--ink); font-size:14.5px;}
+.inst .inst-skip{background:none; border:0; color:var(--sub); font-size:13.5px; text-decoration:underline; padding:6px; cursor:pointer;}
+.inst-card{display:flex; align-items:center; gap:14px;}
+.inst-card .inst-mark{flex:0 0 52px; height:52px; border-radius:14px; background:#13233f; color:#ffcf4a; display:flex; align-items:center; justify-content:center; font:700 19px var(--f-brand, var(--f-display));}
+.inst-card .inst-txt{flex:1; min-width:0;}
+.inst-card h2{margin:0 0 2px;}
+.inst-card p{margin:0; font-size:13.5px; color:var(--sub); line-height:1.6;}
+.inst-card button{flex:0 0 auto; width:auto; padding:10px 16px;}
+/* شاشة «افتح بالمتصفح» لما ينفتح هيرو من داخل انستغرام */
+#inapp{position:fixed; inset:0; z-index:150; display:flex; align-items:center; justify-content:center; padding:calc(20px + env(safe-area-inset-top,0px)) 18px calc(20px + env(safe-area-inset-bottom,0px)); background:radial-gradient(90% 60% at 50% 30%, #223a66, #13233f); overflow-y:auto;}
+#inapp .ia-box{width:100%; max-width:440px; background:var(--card); color:var(--ink); border-radius:22px; padding:22px 18px 16px; box-shadow:0 18px 50px rgba(0,0,0,.35);}
+#inapp .ia-top{text-align:center; margin-bottom:12px;}
+#inapp .ia-word{font:700 40px var(--f-brand, var(--f-display)); color:#c4952f; line-height:1.1;}
+#inapp h3{margin:6px 0 0; font:800 20px var(--f-display);}
+.about-copy{font-size:12px; opacity:.6; margin-top:6px;}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
@@ -744,7 +774,7 @@ h2, .ach-h h3, .pl-name, .about-name{font-family:var(--f-display); font-weight:8
  </g></symbol>
  <symbol id="lg-icon" viewBox="0 0 100 100"><rect width="100" height="100" rx="24" fill="#13233f"/><g transform="translate(10 8) scale(.8)"><use href="#lg-art"/></g></symbol>
 </defs></svg>
-<div id="splash" aria-hidden="true"><div class="sp-nm sp-big">هيرو</div><div class="sp-en">HERO</div><div class="sp-ds">يسويلك جدول تمرين ويتابعك بيه<br>ويحسب أكلك ويتابع وزنك</div><div class="sp-tl" dir="ltr">BE YOUR OWN HERO</div><div class="sp-ld"><i></i></div><div class="sp-by">صُنع في العراق 🇮🇶 · حر العبدلي</div></div>
+<div id="splash" aria-hidden="true"><div class="sp-nm sp-big">هيرو</div><div class="sp-en">HERO</div><div class="sp-ds">يسويلك جدول تمرين ويتابعك بيه<br>ويحسب أكلك ويتابع وزنك</div><div class="sp-tl" dir="ltr">BE YOUR OWN HERO</div><div class="sp-ld"><i></i></div><div class="sp-by">صُنع في العراق 🇮🇶 · حُرّ العبدلي</div></div>
 <script>setTimeout(()=>{ const s = document.getElementById('splash'); if(s){ s.classList.add('out'); setTimeout(()=>s.remove(), 450); } }, 1800);</script>
 <header class="appbar">
   <div class="appbar-in">
@@ -933,6 +963,12 @@ h2, .ach-h h3, .pl-name, .about-name{font-family:var(--f-display); font-weight:8
       <div class="btn-row"><button class="ghost" onclick="openOnboard()">عرض شاشة الترحيب مرة ثانية</button></div>
     </div>
 
+    <div class="card inst-card" id="inst-card" hidden>
+      <div class="inst-mark">هيرو</div>
+      <div class="inst-txt"><h2>نزّل هيرو على شاشتك 📲</h2><p>يفتح مثل أي تطبيق ويشتغل بدون نت</p></div>
+      <button class="primary" onclick="INST.open()">شلون؟</button>
+    </div>
+
     <div class="card fb-card">
       <h2>رأيك يهمنا 💬</h2>
       <p>هيرو بالنسخة التجريبية. أي مشكلة، أو فكرة، أو شي عجبك، اكتبه هنا ويوصل مباشرة لحر.</p>
@@ -942,10 +978,11 @@ h2, .ach-h h3, .pl-name, .about-name{font-family:var(--f-display); font-weight:8
     <div class="card about-card">
       <div class="about-top"><span class="about-word">هيرو</span><span class="about-en">HERO</span></div>
       <div class="about-line">صُنع في العراق 🇮🇶</div>
-      <div class="about-name">حر العبدلي</div>
+      <div class="about-name">حُرّ العبدلي</div>
       <div class="about-sub"><span dir="ltr">@hurr88</span></div>
-      <div class="about-sub" style="opacity:.6">نسخة تجريبية 80</div>
+      <div class="about-sub" style="opacity:.6">نسخة تجريبية 81</div>
       <div class="about-motto" dir="ltr">BE YOUR OWN HERO</div>
+      <div class="about-copy">© 2026 حُرّ العبدلي · جميع الحقوق محفوظة</div>
     </div>
 
     <details class="card">
@@ -3552,6 +3589,7 @@ function obNext(){
   data.onboarded = Date.now(); save();
   document.getElementById('onboard').hidden = true; document.body.classList.remove('sheet-open');
   if(!data.profile) switchTab('profile'); else renderNudge();
+  setTimeout(()=>{ if(typeof INST !== 'undefined') INST.nudge(); }, 1500);
 }
 function obBack(){ if(obStep>0){ obStep--; obSync(); } }
 
@@ -4023,7 +4061,7 @@ function trSetLink(v){
 
 // ---------- ورقة التمرين (بوتوم شيت) ----------
 /* ============ v75: رأيك يهمنا (يوصل برسالة انستغرام) ============ */
-const HERO_VER = '80', FB_IG = 'hurr88';
+const HERO_VER = '81', FB_IG = 'hurr88';
 function fbOpen(type){
   let draft = ''; try{ draft = localStorage.getItem('hero_fb') || ''; }catch(e){}
   const t = type || 'idea';
@@ -4600,13 +4638,132 @@ window.__startedWithoutProfile = !data.profile;
 if(!data.profile) switchTab('profile');
 setCloudStatus('checking');
 renderAchChip();
+/* ============ v81: تنزيل هيرو على الشاشة ============
+   - إذا انفتح من داخل انستغرام (أو فيسبوك، تيك توك…) يطلب يفتحه بـ Safari أو Chrome، لأن هذني المتصفحات ما تنزّل التطبيق وبياناتها ما تنتقل.
+   - بالآيفون يشرح «إضافة إلى الشاشة الرئيسية»، وبالأندرويد يطلع زر «نزّل هيرو» مباشرة إذا المتصفح يدعمه.
+   - يشتغل بنسخة الموقع (PWA) بس، مو بنسخة Claude. */
+const INST = (function(){
+  const UA = navigator.userAgent || '';
+  const PWA = !!window.HERO_PWA;
+  const iOS = /iPhone|iPad|iPod/.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const android = /Android/i.test(UA);
+  const inApp = /Instagram|FBAN|FBAV|FB_IAB|FBIOS|Messenger|Snapchat|TikTok|musical_ly|BytedanceWebview|Line\//i.test(UA);
+  const URL_ = 'https://hurr88ai-bit.github.io/Hero/';
+  const K_SEEN = 'hero_inst_seen';
+  let deferred = null;
+  const ls = { get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }, set(k, v){ try{ localStorage.setItem(k, v); }catch(e){} } };
+  const standalone = () => { try{ return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; }catch(e){ return navigator.standalone === true; } };
+  const SHARE = '<span class="inst-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></span>';
+  const PLUS = '<span class="inst-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg></span>';
+
+  if(PWA){
+    window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; card(); });
+    window.addEventListener('appinstalled', () => { deferred = null; ls.set('hero_installed', '1'); card(); if(typeof trCloseSheet === 'function') trCloseSheet(); if(typeof notify === 'function') notify('تم! هيرو صار على شاشتك 🎉'); });
+  }
+
+  function iosSteps(){
+    return `<ol>
+      <li><span>ادوس زر المشاركة ${SHARE} ${/iPad/.test(UA) ? 'فوك' : 'تحت'} بالمتصفح</span></li>
+      <li><span>انزل شوية واختار <b>«إضافة إلى الشاشة الرئيسية»</b> ${PLUS}<br><small dir="ltr">Add to Home Screen</small></span></li>
+      <li><span>ادوس <b>«إضافة»</b> <small dir="ltr">(Add)</small> فوك</span></li>
+      <li><span>افتح هيرو من الأيقونة الكحلية والذهبية على شاشتك</span></li>
+    </ol>`;
+  }
+  function androidSteps(){
+    return `<ol>
+      <li><span>ادوس النقاط الثلاث <b>⋮</b> فوك بـ Chrome</span></li>
+      <li><span>اختار <b>«تثبيت التطبيق»</b> أو <b>«إضافة إلى الشاشة الرئيسية»</b><br><small dir="ltr">Install app / Add to Home screen</small></span></li>
+      <li><span>ادوس <b>«تثبيت»</b>، وافتح هيرو من أيقونته على شاشتك</span></li>
+    </ol>`;
+  }
+  function guideHTML(){
+    let body;
+    if(android && deferred){
+      body = `<p class="inst-lead">نزّل هيرو على شاشتك بضغطة وحدة، ويفتح مثل أي تطبيق، ويشتغل حتى بدون نت.</p>
+        <button class="inst-btn" onclick="INST.prompt()">📲 نزّل هيرو</button>`;
+    } else if(android){
+      body = `<p class="inst-lead">حتى يصير هيرو على شاشتك مثل أي تطبيق، ويشتغل حتى بدون نت:</p>${androidSteps()}`;
+    } else if(iOS){
+      body = `<p class="inst-lead">حتى يصير هيرو على شاشتك مثل أي تطبيق، ويشتغل حتى بدون نت:</p>${iosSteps()}
+        <p class="inst-why">لازم تكون فاتح هيرو بـ Safari. إذا فاتحه بمتصفح ثاني وما لكيت الخيار، انسخ الرابط وافتحه بـ Safari.</p>
+        <button class="inst-btn alt" onclick="INST.copy()">🔗 انسخ رابط هيرو</button>`;
+    } else {
+      body = `<p class="inst-lead">افتح هذا الرابط من موبايلك (Safari بالآيفون أو Chrome بالأندرويد) حتى تنزّل هيرو على شاشتك:</p>
+        <p class="inst-lead" dir="ltr" style="text-align:center;font-weight:800">hurr88ai-bit.github.io/Hero</p>
+        <button class="inst-btn alt" onclick="INST.copy()">🔗 انسخ الرابط</button>`;
+    }
+    return `<div class="inst">${body}
+      <p class="inst-why">قريباً على App Store و Google Play. لما ينزل، ينزل عليه التحديث وبياناتك تبقى ويّاك.</p>
+      <button class="inst-skip" onclick="trCloseSheet()">بعدين</button></div>`;
+  }
+  function open(){ if(typeof trOpenSheet !== 'function') return; ls.set(K_SEEN, String(Date.now())); trOpenSheet('نزّل هيرو على شاشتك 📲', guideHTML()); }
+
+  // تنبيه تلقائي: مرة كل 3 أيام لحد ما ينزّله، بالموبايل بس، وإذا ماكو نافذة ثانية مفتوحة
+  function nudge(){
+    if(!PWA || standalone() || inApp || ls.get('hero_installed')) return;
+    if(!(iOS || android)) return;
+    const last = Number(ls.get(K_SEEN) || 0);
+    if(Date.now() - last < 3 * 864e5) return;
+    const sh = document.getElementById('tr-sheet'), ob = document.getElementById('onboard');
+    if((sh && !sh.hidden) || (ob && !ob.hidden)) return;
+    open();
+  }
+
+  // داخل انستغرام: شاشة تطلب يفتحه بالمتصفح قبل ما يبدي، حتى بياناته ما تضيع
+  function gate(cont){
+    if(!PWA || !inApp || standalone()) return false;
+    const box = document.createElement('div'); box.id = 'inapp'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true');
+    const appLink = android
+      ? `<a class="inst-btn" href="intent://${URL_.replace('https://', '')}#Intent;scheme=https;package=com.android.chrome;end">🌐 افتح هيرو بـ Chrome</a>`
+      : iOS ? `<a class="inst-btn" href="x-safari-${URL_}">🌐 افتح هيرو بـ Safari</a>` : '';
+    const steps = android
+      ? `<ol><li><span>ادوس النقاط الثلاث <b>⋮</b> فوك يمين</span></li><li><span>اختار <b>«فتح في Chrome»</b> <small dir="ltr">(Open in Chrome)</small></span></li></ol>`
+      : `<ol><li><span>ادوس <b>⋯</b> فوك يمين</span></li><li><span>اختار <b>«فتح في المتصفح الخارجي»</b> <small dir="ltr">(Open in external browser)</small></span></li></ol>`;
+    box.innerHTML = `<div class="ia-box inst">
+      <div class="ia-top"><div class="ia-word">هيرو</div><h3>افتح هيرو بالمتصفح 🌐</h3></div>
+      <p class="inst-lead">انت فاتح هيرو من داخل انستغرام. حتى تنزّله على شاشتك وتنحفظ بياناتك، افتحه بـ ${iOS ? 'Safari' : 'Chrome'}:</p>
+      ${appLink}
+      <p class="inst-why">إذا الزر ما اشتغل:</p>${steps}
+      <button class="inst-btn alt" onclick="INST.copy()">🔗 انسخ الرابط والصقه بالمتصفح</button>
+      <p class="inst-why">بياناتك (أكلك، وزنك، تمارينك) تنحفظ بالمتصفح اللي تستخدمه، فإذا كملت هنا ما تنتقل بعدين.</p>
+      <button class="inst-skip" id="ia-cont">كمل هنا هسه</button>
+    </div>`;
+    document.body.appendChild(box);
+    box.querySelector('#ia-cont').onclick = () => { box.remove(); cont && cont(); };
+    return true;
+  }
+
+  // بطاقة بصفحة ملفي، تبين بس إذا هيرو مو منزّل
+  function card(){
+    const c = document.getElementById('inst-card'); if(!c) return;
+    c.hidden = !PWA || standalone();
+  }
+
+  function copy(){
+    const ok = typeof fbCopy === 'function' ? fbCopy(URL_) : false;
+    if(!ok && navigator.clipboard) navigator.clipboard.writeText(URL_).catch(()=>{});
+    if(typeof notify === 'function') notify('انسخ الرابط ✅ الصقه بـ Safari أو Chrome');
+  }
+  async function prompt(){
+    if(!deferred) { open(); return; }
+    deferred.prompt();
+    try{ const r = await deferred.userChoice; if(r && r.outcome === 'accepted') ls.set('hero_installed', '1'); }catch(e){}
+    deferred = null; card(); trCloseSheet();
+  }
+  return { open, nudge, gate, card, copy, prompt, inApp, standalone };
+})();
+
+INST.card();
 function fixNotice(){
   const K = 'hero_notice_ffix1'; let seen = false; try{ seen = !!localStorage.getItem(K); }catch(e){}
   if(seen || !data.profile || data.profile.sex !== 'f') return;
   try{ localStorage.setItem(K, '1'); }catch(e){}
   trOpenSheet('تحديث هيرو 🛠️', `<div class="fix-note"><div class="big">🦸‍♀️</div><h3>نعتذر عن الخلل</h3><p>تم إصلاح كابتن هيرو البنت. هسه تطلع كاملة بصفحة التمرين.</p><p class="sub">إذا بعدها ما تطلع صح عندچ، دزيلنا من «ملفي ← رأيك يهمنا» 💬</p><button class="primary" onclick="trCloseSheet()">تمام</button></div>`);
 }
-Promise.race([initCloud(), new Promise(r=>setTimeout(r, 4000))]).then(()=>{ if(!data.onboarded) openOnboard(); else setTimeout(fixNotice, 2600); achSoon(); });
+Promise.race([initCloud(), new Promise(r=>setTimeout(r, 4000))]).then(()=>{
+  const go = ()=>{ if(!data.onboarded) openOnboard(); else { setTimeout(fixNotice, 2600); setTimeout(INST.nudge, 3600); } achSoon(); };
+  if(!INST.gate(go)) go();
+});
 </script>
 <script>
 /* ============ عافية · محرك المدرب ثلاثي الأبعاد (نموذج مؤقت) ============
