@@ -759,6 +759,11 @@ h2, .ach-h h3, .pl-name, .about-name{font-family:var(--f-display); font-weight:8
 #inapp .ia-top{text-align:center; margin-bottom:12px;}
 #inapp .ia-word{font:700 40px var(--f-brand, var(--f-display)); color:#c4952f; line-height:1.1;}
 #inapp h3{margin:6px 0 0; font:800 20px var(--f-display);}
+.inst-lang{display:flex; gap:4px; align-self:center; background:var(--card-2); border-radius:99px; padding:3px;}
+.inst-lang button{width:auto; border:0; background:none; padding:6px 16px; border-radius:99px; font:700 13px var(--f-body); color:var(--sub); cursor:pointer;}
+.inst-lang button.on{background:#13233f; color:#ffcf4a;}
+.inst[lang="en"]{font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;}
+.inst[lang="en"] .ia-word{font:800 34px var(--f-brand-en); letter-spacing:4px;}
 .about-copy{font-size:12px; opacity:.6; margin-top:6px;}
 </style>
 
@@ -980,7 +985,7 @@ h2, .ach-h h3, .pl-name, .about-name{font-family:var(--f-display); font-weight:8
       <div class="about-line">صُنع في العراق 🇮🇶</div>
       <div class="about-name">حُرّ العبدلي</div>
       <div class="about-sub"><span dir="ltr">@hurr88</span></div>
-      <div class="about-sub" style="opacity:.6">نسخة تجريبية 81</div>
+      <div class="about-sub" style="opacity:.6">نسخة تجريبية 82</div>
       <div class="about-motto" dir="ltr">BE YOUR OWN HERO</div>
       <div class="about-copy">© 2026 حُرّ العبدلي · جميع الحقوق محفوظة</div>
     </div>
@@ -4061,7 +4066,7 @@ function trSetLink(v){
 
 // ---------- ورقة التمرين (بوتوم شيت) ----------
 /* ============ v75: رأيك يهمنا (يوصل برسالة انستغرام) ============ */
-const HERO_VER = '81', FB_IG = 'hurr88';
+const HERO_VER = '82', FB_IG = 'hurr88';
 function fbOpen(type){
   let draft = ''; try{ draft = localStorage.getItem('hero_fb') || ''; }catch(e){}
   const t = type || 'idea';
@@ -4638,119 +4643,153 @@ window.__startedWithoutProfile = !data.profile;
 if(!data.profile) switchTab('profile');
 setCloudStatus('checking');
 renderAchChip();
-/* ============ v81: تنزيل هيرو على الشاشة ============
+/* ============ v81–82: تنزيل هيرو على الشاشة (عربي + English) ============
    - إذا انفتح من داخل انستغرام (أو فيسبوك، تيك توك…) يطلب يفتحه بـ Safari أو Chrome، لأن هذني المتصفحات ما تنزّل التطبيق وبياناتها ما تنتقل.
    - بالآيفون يشرح «إضافة إلى الشاشة الرئيسية»، وبالأندرويد يطلع زر «نزّل هيرو» مباشرة إذا المتصفح يدعمه.
+   - v82: الدليل بالإنگليزي تلقائياً إذا لغة الموبايل مو عربي، ويا زر «عربي / English».
    - يشتغل بنسخة الموقع (PWA) بس، مو بنسخة Claude. */
 const INST = (function(){
   const UA = navigator.userAgent || '';
   const PWA = !!window.HERO_PWA;
   const iOS = /iPhone|iPad|iPod/.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const iPad = /iPad/.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const android = /Android/i.test(UA);
   const inApp = /Instagram|FBAN|FBAV|FB_IAB|FBIOS|Messenger|Snapchat|TikTok|musical_ly|BytedanceWebview|Line\//i.test(UA);
   const URL_ = 'https://hurr88ai-bit.github.io/Hero/';
-  const K_SEEN = 'hero_inst_seen';
-  let deferred = null;
+  const K_SEEN = 'hero_inst_seen', K_LANG = 'hero_inst_lang';
+  let deferred = null, gateCont = null;
   const ls = { get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }, set(k, v){ try{ localStorage.setItem(k, v); }catch(e){} } };
   const standalone = () => { try{ return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; }catch(e){ return navigator.standalone === true; } };
+  const langs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'ar']).map(l => String(l).toLowerCase());
+  let lang = ls.get(K_LANG) || (langs[0].startsWith('ar') ? 'ar' : 'en');
+
   const SHARE = '<span class="inst-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></span>';
   const PLUS = '<span class="inst-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg></span>';
 
+  const T = {
+    ar: {
+      title: 'نزّل هيرو على شاشتك 📲',
+      leadSteps: 'حتى يصير هيرو على شاشتك مثل أي تطبيق، ويشتغل حتى بدون نت:',
+      leadBtn: 'نزّل هيرو على شاشتك بضغطة وحدة، ويفتح مثل أي تطبيق، ويشتغل حتى بدون نت.',
+      btn: '📲 نزّل هيرو',
+      ios: [`ادوس زر المشاركة ${SHARE} ${iPad ? 'فوك' : 'تحت'} بالمتصفح`, `انزل شوية واختار <b>«إضافة إلى الشاشة الرئيسية»</b> ${PLUS}`, `ادوس <b>«إضافة»</b> فوك`, `افتح هيرو من الأيقونة الكحلية والذهبية على شاشتك`],
+      and: [`ادوس النقاط الثلاث <b>⋮</b> فوك بـ Chrome`, `اختار <b>«تثبيت التطبيق»</b> أو <b>«إضافة إلى الشاشة الرئيسية»</b>`, `ادوس <b>«تثبيت»</b>، وافتح هيرو من أيقونته على شاشتك`],
+      iosWhy: 'لازم تكون فاتح هيرو بـ Safari. إذا فاتحه بمتصفح ثاني وما لكيت الخيار، انسخ الرابط وافتحه بـ Safari.',
+      copy: '🔗 انسخ رابط هيرو',
+      desk: 'افتح هذا الرابط من موبايلك (Safari بالآيفون أو Chrome بالأندرويد) حتى تنزّل هيرو على شاشتك:',
+      soon: 'قريباً على App Store و Google Play. لما ينزل، ينزل عليه التحديث وبياناتك تبقى ويّاك.',
+      later: 'بعدين',
+      iaTitle: 'افتح هيرو بالمتصفح 🌐',
+      iaLead: b => `انت فاتح هيرو من داخل انستغرام. حتى تنزّله على شاشتك وتنحفظ بياناتك، افتحه بـ ${b}:`,
+      iaBtn: b => `🌐 افتح هيرو بـ ${b}`,
+      iaIf: 'إذا الزر ما اشتغل:',
+      iaIos: [`ادوس <b>⋯</b> فوك يمين`, `اختار <b>«فتح في المتصفح الخارجي»</b>`],
+      iaAnd: [`ادوس النقاط الثلاث <b>⋮</b> فوك يمين`, `اختار <b>«فتح في Chrome»</b>`],
+      iaCopy: '🔗 انسخ الرابط والصقه بالمتصفح',
+      iaData: 'بياناتك (أكلك، وزنك، تمارينك) تنحفظ بالمتصفح اللي تستخدمه، فإذا كملت هنا ما تنتقل بعدين.',
+      iaCont: 'كمل هنا هسه',
+      copied: 'انسخ الرابط ✅ الصقه بـ Safari أو Chrome',
+      done: 'تم! هيرو صار على شاشتك 🎉'
+    },
+    en: {
+      title: 'Add HERO to your home screen 📲',
+      leadSteps: 'Get HERO on your home screen like any app. It even works offline:',
+      leadBtn: 'Install HERO in one tap. It opens like any app and works offline.',
+      btn: '📲 Install HERO',
+      ios: [`Tap the Share button ${SHARE} at the ${iPad ? 'top' : 'bottom'} of Safari`, `Scroll down and tap <b>“Add to Home Screen”</b> ${PLUS}`, `Tap <b>“Add”</b> at the top`, `Open HERO from the navy and gold icon on your home screen`],
+      and: [`Tap the three dots <b>⋮</b> at the top of Chrome`, `Tap <b>“Install app”</b> or <b>“Add to Home screen”</b>`, `Tap <b>“Install”</b>, then open HERO from your home screen`],
+      iosWhy: 'You need to open HERO in Safari. If you’re in another browser and can’t find the option, copy the link and open it in Safari.',
+      copy: '🔗 Copy the HERO link',
+      desk: 'Open this link on your phone (Safari on iPhone, Chrome on Android) to add HERO to your home screen:',
+      soon: 'Coming soon to the App Store and Google Play. When it launches, your data comes with you.',
+      later: 'Later',
+      iaTitle: 'Open HERO in your browser 🌐',
+      iaLead: b => `You opened HERO inside Instagram. To install it and keep your data safe, open it in ${b}:`,
+      iaBtn: b => `🌐 Open HERO in ${b}`,
+      iaIf: 'If the button doesn’t work:',
+      iaIos: [`Tap <b>⋯</b> at the top right`, `Tap <b>“Open in external browser”</b>`],
+      iaAnd: [`Tap the three dots <b>⋮</b> at the top right`, `Tap <b>“Open in Chrome”</b>`],
+      iaCopy: '🔗 Copy the link and paste it in your browser',
+      iaData: 'Your data (meals, weight, workouts) is saved in the browser you use, so if you continue here it won’t move over later.',
+      iaCont: 'Continue here for now',
+      copied: 'Link copied ✅ Paste it in Safari or Chrome',
+      done: 'Done! HERO is on your home screen 🎉'
+    }
+  };
+  const t = () => T[lang];
+  const dirAttr = () => lang === 'en' ? ' dir="ltr" lang="en"' : ' dir="rtl" lang="ar"';
+  const ol = arr => `<ol>${arr.map(x => `<li><span>${x}</span></li>`).join('')}</ol>`;
+  const sw = () => `<div class="inst-lang"><button class="${lang === 'ar' ? 'on' : ''}" onclick="INST.lang('ar')">عربي</button><button class="${lang === 'en' ? 'on' : ''}" onclick="INST.lang('en')">English</button></div>`;
+
   if(PWA){
     window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; card(); });
-    window.addEventListener('appinstalled', () => { deferred = null; ls.set('hero_installed', '1'); card(); if(typeof trCloseSheet === 'function') trCloseSheet(); if(typeof notify === 'function') notify('تم! هيرو صار على شاشتك 🎉'); });
+    window.addEventListener('appinstalled', () => { deferred = null; ls.set('hero_installed', '1'); card(); if(typeof trCloseSheet === 'function') trCloseSheet(); if(typeof notify === 'function') notify(t().done); });
   }
 
-  function iosSteps(){
-    return `<ol>
-      <li><span>ادوس زر المشاركة ${SHARE} ${/iPad/.test(UA) ? 'فوك' : 'تحت'} بالمتصفح</span></li>
-      <li><span>انزل شوية واختار <b>«إضافة إلى الشاشة الرئيسية»</b> ${PLUS}<br><small dir="ltr">Add to Home Screen</small></span></li>
-      <li><span>ادوس <b>«إضافة»</b> <small dir="ltr">(Add)</small> فوك</span></li>
-      <li><span>افتح هيرو من الأيقونة الكحلية والذهبية على شاشتك</span></li>
-    </ol>`;
-  }
-  function androidSteps(){
-    return `<ol>
-      <li><span>ادوس النقاط الثلاث <b>⋮</b> فوك بـ Chrome</span></li>
-      <li><span>اختار <b>«تثبيت التطبيق»</b> أو <b>«إضافة إلى الشاشة الرئيسية»</b><br><small dir="ltr">Install app / Add to Home screen</small></span></li>
-      <li><span>ادوس <b>«تثبيت»</b>، وافتح هيرو من أيقونته على شاشتك</span></li>
-    </ol>`;
-  }
   function guideHTML(){
-    let body;
-    if(android && deferred){
-      body = `<p class="inst-lead">نزّل هيرو على شاشتك بضغطة وحدة، ويفتح مثل أي تطبيق، ويشتغل حتى بدون نت.</p>
-        <button class="inst-btn" onclick="INST.prompt()">📲 نزّل هيرو</button>`;
-    } else if(android){
-      body = `<p class="inst-lead">حتى يصير هيرو على شاشتك مثل أي تطبيق، ويشتغل حتى بدون نت:</p>${androidSteps()}`;
-    } else if(iOS){
-      body = `<p class="inst-lead">حتى يصير هيرو على شاشتك مثل أي تطبيق، ويشتغل حتى بدون نت:</p>${iosSteps()}
-        <p class="inst-why">لازم تكون فاتح هيرو بـ Safari. إذا فاتحه بمتصفح ثاني وما لكيت الخيار، انسخ الرابط وافتحه بـ Safari.</p>
-        <button class="inst-btn alt" onclick="INST.copy()">🔗 انسخ رابط هيرو</button>`;
-    } else {
-      body = `<p class="inst-lead">افتح هذا الرابط من موبايلك (Safari بالآيفون أو Chrome بالأندرويد) حتى تنزّل هيرو على شاشتك:</p>
-        <p class="inst-lead" dir="ltr" style="text-align:center;font-weight:800">hurr88ai-bit.github.io/Hero</p>
-        <button class="inst-btn alt" onclick="INST.copy()">🔗 انسخ الرابط</button>`;
-    }
-    return `<div class="inst">${body}
-      <p class="inst-why">قريباً على App Store و Google Play. لما ينزل، ينزل عليه التحديث وبياناتك تبقى ويّاك.</p>
-      <button class="inst-skip" onclick="trCloseSheet()">بعدين</button></div>`;
+    const L = t(); let body;
+    if(android && deferred) body = `<p class="inst-lead">${L.leadBtn}</p><button class="inst-btn" onclick="INST.prompt()">${L.btn}</button>`;
+    else if(android) body = `<p class="inst-lead">${L.leadSteps}</p>${ol(L.and)}`;
+    else if(iOS) body = `<p class="inst-lead">${L.leadSteps}</p>${ol(L.ios)}<p class="inst-why">${L.iosWhy}</p><button class="inst-btn alt" onclick="INST.copy()">${L.copy}</button>`;
+    else body = `<p class="inst-lead">${L.desk}</p><p class="inst-lead" dir="ltr" style="text-align:center;font-weight:800">hurr88ai-bit.github.io/Hero</p><button class="inst-btn alt" onclick="INST.copy()">${L.copy}</button>`;
+    return `<div class="inst"${dirAttr()}>${sw()}${body}<p class="inst-why">${L.soon}</p><button class="inst-skip" onclick="trCloseSheet()">${L.later}</button></div>`;
   }
-  function open(){ if(typeof trOpenSheet !== 'function') return; ls.set(K_SEEN, String(Date.now())); trOpenSheet('نزّل هيرو على شاشتك 📲', guideHTML()); }
+  function open(){ if(typeof trOpenSheet !== 'function') return; ls.set(K_SEEN, String(Date.now())); trOpenSheet(t().title, guideHTML()); }
 
   // تنبيه تلقائي: مرة كل 3 أيام لحد ما ينزّله، بالموبايل بس، وإذا ماكو نافذة ثانية مفتوحة
   function nudge(){
     if(!PWA || standalone() || inApp || ls.get('hero_installed')) return;
     if(!(iOS || android)) return;
-    const last = Number(ls.get(K_SEEN) || 0);
-    if(Date.now() - last < 3 * 864e5) return;
+    if(Date.now() - Number(ls.get(K_SEEN) || 0) < 3 * 864e5) return;
     const sh = document.getElementById('tr-sheet'), ob = document.getElementById('onboard');
     if((sh && !sh.hidden) || (ob && !ob.hidden)) return;
     open();
   }
 
   // داخل انستغرام: شاشة تطلب يفتحه بالمتصفح قبل ما يبدي، حتى بياناته ما تضيع
+  function gateHTML(){
+    const L = t(), b = iOS ? 'Safari' : 'Chrome';
+    const appLink = android ? `<a class="inst-btn" href="intent://${URL_.replace('https://', '')}#Intent;scheme=https;package=com.android.chrome;end">${L.iaBtn(b)}</a>`
+      : iOS ? `<a class="inst-btn" href="x-safari-${URL_}">${L.iaBtn(b)}</a>` : '';
+    return `<div class="ia-box inst"${dirAttr()}>${sw()}
+      <div class="ia-top"><div class="ia-word">${lang === 'en' ? 'HERO' : 'هيرو'}</div><h3>${L.iaTitle}</h3></div>
+      <p class="inst-lead">${L.iaLead(b)}</p>${appLink}
+      <p class="inst-why">${L.iaIf}</p>${ol(android ? L.iaAnd : L.iaIos)}
+      <button class="inst-btn alt" onclick="INST.copy()">${L.iaCopy}</button>
+      <p class="inst-why">${L.iaData}</p>
+      <button class="inst-skip" onclick="INST.cont()">${L.iaCont}</button></div>`;
+  }
   function gate(cont){
     if(!PWA || !inApp || standalone()) return false;
+    gateCont = cont;
     const box = document.createElement('div'); box.id = 'inapp'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true');
-    const appLink = android
-      ? `<a class="inst-btn" href="intent://${URL_.replace('https://', '')}#Intent;scheme=https;package=com.android.chrome;end">🌐 افتح هيرو بـ Chrome</a>`
-      : iOS ? `<a class="inst-btn" href="x-safari-${URL_}">🌐 افتح هيرو بـ Safari</a>` : '';
-    const steps = android
-      ? `<ol><li><span>ادوس النقاط الثلاث <b>⋮</b> فوك يمين</span></li><li><span>اختار <b>«فتح في Chrome»</b> <small dir="ltr">(Open in Chrome)</small></span></li></ol>`
-      : `<ol><li><span>ادوس <b>⋯</b> فوك يمين</span></li><li><span>اختار <b>«فتح في المتصفح الخارجي»</b> <small dir="ltr">(Open in external browser)</small></span></li></ol>`;
-    box.innerHTML = `<div class="ia-box inst">
-      <div class="ia-top"><div class="ia-word">هيرو</div><h3>افتح هيرو بالمتصفح 🌐</h3></div>
-      <p class="inst-lead">انت فاتح هيرو من داخل انستغرام. حتى تنزّله على شاشتك وتنحفظ بياناتك، افتحه بـ ${iOS ? 'Safari' : 'Chrome'}:</p>
-      ${appLink}
-      <p class="inst-why">إذا الزر ما اشتغل:</p>${steps}
-      <button class="inst-btn alt" onclick="INST.copy()">🔗 انسخ الرابط والصقه بالمتصفح</button>
-      <p class="inst-why">بياناتك (أكلك، وزنك، تمارينك) تنحفظ بالمتصفح اللي تستخدمه، فإذا كملت هنا ما تنتقل بعدين.</p>
-      <button class="inst-skip" id="ia-cont">كمل هنا هسه</button>
-    </div>`;
-    document.body.appendChild(box);
-    box.querySelector('#ia-cont').onclick = () => { box.remove(); cont && cont(); };
+    box.innerHTML = gateHTML(); document.body.appendChild(box);
     return true;
+  }
+  function cont(){ const box = document.getElementById('inapp'); if(box) box.remove(); const c = gateCont; gateCont = null; c && c(); }
+
+  function setLang(l){
+    lang = l === 'en' ? 'en' : 'ar'; ls.set(K_LANG, lang);
+    const box = document.getElementById('inapp'); if(box) box.innerHTML = gateHTML();
+    const sh = document.getElementById('tr-sheet');
+    if(sh && !sh.hidden && document.querySelector('#tr-sheet-body .inst')){ document.getElementById('tr-sheet-title').textContent = t().title; document.getElementById('tr-sheet-body').innerHTML = guideHTML(); }
   }
 
   // بطاقة بصفحة ملفي، تبين بس إذا هيرو مو منزّل
-  function card(){
-    const c = document.getElementById('inst-card'); if(!c) return;
-    c.hidden = !PWA || standalone();
-  }
+  function card(){ const c = document.getElementById('inst-card'); if(c) c.hidden = !PWA || standalone(); }
 
   function copy(){
     const ok = typeof fbCopy === 'function' ? fbCopy(URL_) : false;
     if(!ok && navigator.clipboard) navigator.clipboard.writeText(URL_).catch(()=>{});
-    if(typeof notify === 'function') notify('انسخ الرابط ✅ الصقه بـ Safari أو Chrome');
+    if(typeof notify === 'function') notify(t().copied);
   }
   async function prompt(){
-    if(!deferred) { open(); return; }
+    if(!deferred){ open(); return; }
     deferred.prompt();
     try{ const r = await deferred.userChoice; if(r && r.outcome === 'accepted') ls.set('hero_installed', '1'); }catch(e){}
     deferred = null; card(); trCloseSheet();
   }
-  return { open, nudge, gate, card, copy, prompt, inApp, standalone };
+  return { open, nudge, gate, cont, card, copy, prompt, lang: setLang, inApp, standalone };
 })();
 
 INST.card();
