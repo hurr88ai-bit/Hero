@@ -1,0 +1,12 @@
+<!doctype html><meta charset="utf-8"><title>HERO media</title>
+<script>
+// يرسل ملف من مجلد المحتوى للنافذة اللي فتحته (instagram.com) حتى ينرفع بالنشر
+(async()=>{
+  const f = new URLSearchParams(location.search).get('f') || '';
+  if(!/^[\w.-]+$/.test(f) || !window.opener){ document.body.textContent = 'no'; return; }
+  const b = await (await fetch(f)).arrayBuffer();
+  window.opener.postMessage({heroMedia:true, name:f, type: f.endsWith('.mp4') ? 'video/mp4' : 'image/jpeg', buf:b}, 'https://www.instagram.com', [b]);
+  document.body.textContent = 'sent ' + f;
+  setTimeout(()=>window.close(), 500);
+})();
+</script>
