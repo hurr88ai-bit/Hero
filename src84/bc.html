@@ -1,0 +1,23 @@
+
+<div id="bc" class="bc" hidden role="dialog" aria-modal="true" aria-label="امسح الباركود">
+  <div class="bc-top">
+    <button type="button" class="bc-x" onclick="BC.close()" aria-label="إغلاق">✕</button>
+    <div class="bc-title">امسح الباركود</div>
+    <button type="button" class="bc-x bc-torch" id="bc-torch" onclick="BC.torch()" aria-label="الضوء" hidden>🔦</button>
+  </div>
+  <div id="bc-live">
+    <div class="bc-cam">
+      <video id="bc-video" playsinline muted autoplay></video>
+      <div class="bc-frame" id="bc-frame"><i></i></div>
+    </div>
+    <div class="bc-msg" id="bc-msg"></div>
+    <div class="bc-alt">
+      <label class="bc-photo">📸 صوّر الباركود<input type="file" accept="image/*" capture="environment" onchange="BC.photo(this)"></label>
+      <div class="bc-type">
+        <input type="text" id="bc-code" inputmode="numeric" autocomplete="off" placeholder="أو اكتب رقم الباركود" onkeydown="if(event.key==='Enter') BC.typed()">
+        <button type="button" onclick="BC.typed()">بحث</button>
+      </div>
+    </div>
+  </div>
+  <div id="bc-res" class="bc-res" hidden></div>
+</div>

@@ -1,5 +1,5 @@
 // هيرو · service worker (يخلي التطبيق يشتغل بدون نت ويحدّث نفسه)
-const CACHE = 'hero-83-2e1ebc57';
+const CACHE = 'hero-84-a5c2969d';
 const CORE = ["./", "index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-180.png", "icons/icon-32.png", "vendor/three.module.min.js", "vendor/jsm/environments/RoomEnvironment.js", "coach-mh.js", "real.js", "anat.js", "body-meta.json", "body-shared.txt", "body-m.txt", "body-f.txt", "muscles-m.txt", "muscles-f.txt"];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE))); self.skipWaiting(); });
 self.addEventListener('activate', e => {
@@ -11,6 +11,10 @@ self.addEventListener('fetch', e => {
   if (req.mode === 'navigate') {   // الصفحة: من النت أول حتى يوصل التحديث، وإذا ماكو نت من الذاكرة
     e.respondWith(fetch(req).then(r => { const cp = r.clone(); caches.open(CACHE).then(c => c.put('index.html', cp)); return r; })
       .catch(() => caches.match('index.html')));
+    return;
+  }
+  if (url.origin === location.origin && url.pathname.includes('/vendor/zxing/')) {   // قارئ الباركود: ينحفظ أول مرة ينستعمل
+    e.respondWith(caches.match(req, {ignoreSearch: true}).then(r => r || fetch(req).then(res => { if (res.ok) { const cp = res.clone(); caches.open(CACHE).then(c => c.put(req, cp)); } return res; })));
     return;
   }
   if (url.origin === location.origin) { e.respondWith(caches.match(req, {ignoreSearch: true}).then(r => r || fetch(req))); return; }
