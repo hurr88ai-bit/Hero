@@ -1735,5 +1735,7 @@
 "بياناتك تنحفظ بموبايلك بس. ما عدنا سيرفر، وما نبيع أو نشارك أي شي.": "Your data is saved only on your phone. We have no server, and we never sell or share anything.",
 "سياسة الخصوصية": "Privacy Policy",
 "الشروط والأحكام": "Terms of Use",
-"قريت التنبيه، وأوافق على الشروط وسياسة الخصوصية": "I've read the notice and agree to the Terms and Privacy Policy"
+"قريت التنبيه، وأوافق على الشروط وسياسة الخصوصية": "I've read the notice and agree to the Terms and Privacy Policy",
+"قريت التنبيه، وعمري 18 سنة أو أكثر، وأوافق على الشروط وسياسة الخصوصية": "I've read the notice, I'm 18 or older, and I agree to the Terms and Privacy Policy",
+"موافق": "I agree"
 }
