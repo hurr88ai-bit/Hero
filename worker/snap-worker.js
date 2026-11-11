@@ -1,5 +1,5 @@
 // هيرو · سيرفر «صوّر صحنك» (Cloudflare Worker) · © 2026 حُرّ العبدلي. الدليل: worker/README.md
-const MODEL = 'claude-haiku-5-5';
+const DEFAULT_MODEL = 'claude-haiku-5-5';   // يتغيّر من Cloudflare: متغيّر SNAP_MODEL
 const ALLOWED_ORIGINS = [
   'https://hurr88ai-bit.github.io',
   'https://heroapp.iq', 'https://www.heroapp.iq',
@@ -13,7 +13,7 @@ You get ONE photo and a numbered CATALOG of food names (mostly Arabic, Iraqi dia
 Identify every distinct food/drink visible and estimate the edible weight in grams of each, as served (cooked weight for cooked food).
 
 MATCHING:
-- Return the CATALOG number of the best entry in "id". Prefer the entry matching the cooking method you see (fried vs boiled vs grilled, Iraqi rice "تمن" with fat vs plain boiled rice).
+- Return the CATALOG number of the best entry in "id" AND copy that entry's exact text into "catalog_name". Prefer the entry matching the cooking method you see (fried vs boiled vs grilled, Iraqi rice "تمن" with fat vs plain boiled rice).
 - If the exact dish is not in the catalog, DO NOT use 0: pick the closest entry for its main ingredient (e.g. chicken with turmeric or chicken stew -> a grilled/cooked chicken entry; beef stew -> the closest cooked meat; fried potato cubes -> fried potatoes). Write the real dish name in "seen".
 - Use id 0 only when nothing in the catalog is even the same kind of food.
 - Split a composite plate into its parts when the catalog has the parts (rice + stew + salad), unless the catalog has the whole dish.
@@ -24,13 +24,14 @@ PORTION SIZE (most important - be accurate, not generous):
 - Vision models systematically OVERESTIMATE food weight by 50-150%. Correct for this: after your first guess, choose the smaller realistic value. Never round up.
 - First describe the size in "basis" (count x unit weight, or volume like "about 1/2 cup", "a mound the size of an egg"), then derive grams from it.
 - Reference weights (cooked, edible part):
-  * cooked rice: 1 cup = 160 g; a mound the size of a fist = 120 g; an egg-sized mound = 50 g; a thin layer covering 1/4 of a dinner plate = 80-100 g.
-  * potatoes: one cube/wedge 15-25 g; one small whole potato 80 g; a few fried pieces 40-60 g; a small fries portion 70 g.
-  * chicken: drumstick 60 g meat; thigh 80 g; a palm-sized piece (no fingers) 90 g; half a small breast 80 g.
+  * cooked rice: 1 cup = 160 g; a mound the size of a fist = 120 g; an egg-sized mound = 50 g; loose fluffy basmati covering 1/3 of a dinner plate (2-3 cm high) = 100 g.
+  * potatoes: small diced cube (1-1.5 cm) = 3 g, so count the cubes; large chunk (3-4 cm) = 20-25 g; one small whole potato 80 g; a small fries portion 70 g.
+  * chicken: drumstick 60 g meat; thigh 80 g; a palm-sized piece (no fingers) 90 g; half a small breast 80 g; shredded/pulled pieces look bigger than they weigh - a loose pile covering 1/4 of a plate = 90-110 g.
   * meat/kebab: one kebab skewer 60-80 g; a meatball 25 g.
   * stew/soup (مرق): one ladle 200 g; a small bowl 250 g.
   * bread: صمون 90 g; a quarter of a flat خبز 20 g.
   * salad: a side handful 50-80 g. Tomato/cucumber slice 10-15 g.
+- Use visible cutlery for scale: a tablespoon bowl is about 4.5 cm long, a teaspoon bowl 3.5 cm, a fork 19 cm.
 - Dinner plate is about 26 cm wide; side plates/bowls are smaller. Judge depth: food on a plate is usually only 1-3 cm thick.
 - A normal home portion of rice is 100-200 g. Totals above 900 g for one person's plate are almost always wrong.
 
@@ -52,12 +53,13 @@ const TOOL = {
           type: 'object',
           properties: {
             id: { type: 'integer', description: 'CATALOG number, or 0 if no match' },
+            catalog_name: { type: 'string', description: 'Exact text of the chosen CATALOG entry (empty if id is 0)' },
             seen: { type: 'string', description: 'Short name of the dish you see (language as requested)' },
             basis: { type: 'string', description: 'How you sized it: count x unit weight or volume comparison, in English, max 12 words' },
             grams: { type: 'number', description: 'Edible grams derived from basis, after correcting for overestimation' },
             confidence: { type: 'number' },
           },
-          required: ['id', 'seen', 'basis', 'grams', 'confidence'],
+          required: ['id', 'catalog_name', 'seen', 'basis', 'grams', 'confidence'],
         },
       },
       problem: { type: 'string', enum: ['none', 'no_food', 'unclear'] },
@@ -119,11 +121,11 @@ export default {
 
     const catalog = names.map((n, i) => `${i + 1}. ${n}`).join('\n');
     const req = {
-      model: MODEL,
+      model: env.SNAP_MODEL || DEFAULT_MODEL,
       max_tokens: 1200,
       system: [{ type: 'text', text: SYSTEM }, { type: 'text', text: 'CATALOG:\n' + catalog, cache_control: { type: 'ephemeral' } }],
       tools: [TOOL],
-      tool_choice: { type: 'tool', name: 'report_plate' },
+      tool_choice: { type: 'auto' },
       messages: [{ role: 'user', content: [
         { type: 'image', source: { type: 'base64', media_type: mediaType, data: image } },
         { type: 'text', text: 'Identify the foods on this plate and estimate grams.' + (lang === 'en' ? ' Write "seen" in English.' : ' Write "seen" in Arabic.') },
@@ -147,9 +149,11 @@ export default {
     if (!call || !call.input) return json({ error: 'upstream' }, 502, origin);
 
     const items = (Array.isArray(call.input.items) ? call.input.items : []).slice(0, 12).map(it => {
-      const id = Math.round(Number(it.id) || 0);
+      const id = Math.round(Number(it.id) || 0), cn = String(it.catalog_name || '').trim();
+      let name = id >= 1 && id <= names.length ? names[id - 1] : null;
+      if (cn && name !== cn && names.includes(cn)) name = cn;
       return {
-        name: id >= 1 && id <= names.length ? names[id - 1] : null,
+        name,
         seen: String(it.seen || '').slice(0, 80),
         grams: Math.min(1500, Math.max(1, Math.round(Number(it.grams) || 0))),
         confidence: Math.min(1, Math.max(0, Number(it.confidence) || 0)),
