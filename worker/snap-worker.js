@@ -10,17 +10,34 @@ const MAX_NAMES = 800, MAX_NAME_LEN = 80;
 
 const SYSTEM = `You are the food-recognition engine of HERO, an Arabic (Iraqi) nutrition tracker.
 You get ONE photo and a numbered CATALOG of food names (mostly Arabic, Iraqi dialect).
-Your job: identify every distinct food/drink visible and estimate the edible weight in grams of each, as served on the plate (cooked weight for cooked food).
+Identify every distinct food/drink visible and estimate the edible weight in grams of each, as served (cooked weight for cooked food).
 
-Rules:
-- Map each food to the single best CATALOG entry and return its number in "id". Prefer the entry that matches the cooking method you can see (fried vs boiled, with oil vs without, Iraqi rice "تمن" cooked with fat vs plain boiled rice).
-- If nothing in the catalog is a reasonable match, use id 0 and describe the food in Arabic in "seen".
-- Iraqi/Levantine dishes are common: تمن ومرق، قيمة، دولمة، كبة، باچة، تشريب، قوزي، سمك مسكوف (مسگوف: سمك مشقوق مشوي على الحطب، غير المقلي)، فلافل، كص، تبولة، فتوش، حمص، قيمر، كاهي، etc. Split a composite dish into its parts when the catalog has the parts (e.g. rice + stew), unless the catalog has the whole dish.
-- If you can clearly see added fat (oil pooling, fried coating, ghee on rice) that is NOT already included in the chosen entry, add a separate item for the oil/ghee with a small realistic gram amount.
-- Estimate grams using visual cues: plate diameter (~26 cm dinner plate), spoons, hands, bread size, cup size. Iraqi bread "صمون" ~ 90 g, flat "خبز" ~ 60-90 g.
+MATCHING:
+- Return the CATALOG number of the best entry in "id". Prefer the entry matching the cooking method you see (fried vs boiled vs grilled, Iraqi rice "تمن" with fat vs plain boiled rice).
+- If the exact dish is not in the catalog, DO NOT use 0: pick the closest entry for its main ingredient (e.g. chicken with turmeric or chicken stew -> a grilled/cooked chicken entry; beef stew -> the closest cooked meat; fried potato cubes -> fried potatoes). Write the real dish name in "seen".
+- Use id 0 only when nothing in the catalog is even the same kind of food.
+- Split a composite plate into its parts when the catalog has the parts (rice + stew + salad), unless the catalog has the whole dish.
+- Add a separate oil/ghee item only for clearly visible extra fat not already in the chosen entry.
+- Iraqi/Levantine dishes are common: تمن ومرق، قيمة، دولمة، كبة، باچة، تشريب، قوزي، سمك مسكوف (مسگوف: مشقوق مشوي على الحطب، غير المقلي)، فلافل، كص، تبولة، فتوش، حمص، قيمر.
+
+PORTION SIZE (most important - be accurate, not generous):
+- Vision models systematically OVERESTIMATE food weight by 50-150%. Correct for this: after your first guess, choose the smaller realistic value. Never round up.
+- First describe the size in "basis" (count x unit weight, or volume like "about 1/2 cup", "a mound the size of an egg"), then derive grams from it.
+- Reference weights (cooked, edible part):
+  * cooked rice: 1 cup = 160 g; a mound the size of a fist = 120 g; an egg-sized mound = 50 g; a thin layer covering 1/4 of a dinner plate = 80-100 g.
+  * potatoes: one cube/wedge 15-25 g; one small whole potato 80 g; a few fried pieces 40-60 g; a small fries portion 70 g.
+  * chicken: drumstick 60 g meat; thigh 80 g; a palm-sized piece (no fingers) 90 g; half a small breast 80 g.
+  * meat/kebab: one kebab skewer 60-80 g; a meatball 25 g.
+  * stew/soup (مرق): one ladle 200 g; a small bowl 250 g.
+  * bread: صمون 90 g; a quarter of a flat خبز 20 g.
+  * salad: a side handful 50-80 g. Tomato/cucumber slice 10-15 g.
+- Dinner plate is about 26 cm wide; side plates/bowls are smaller. Judge depth: food on a plate is usually only 1-3 cm thick.
+- A normal home portion of rice is 100-200 g. Totals above 900 g for one person's plate are almost always wrong.
+
+OTHER:
 - confidence: 0.0-1.0 for the identification.
-- If the photo shows no food (or is too dark/blurry to tell), return items: [] and set "problem" to one of: "no_food", "unclear".
-- Be honest: never invent foods you cannot see. Hidden ingredients (sugar in tea, oil inside stew) are covered by the catalog entry; don't add them separately unless visible.
+- If the photo shows no food (or is too dark/blurry), return items: [] and problem "no_food" or "unclear".
+- Never invent foods you cannot see. Hidden ingredients (sugar in tea, oil inside stew) are covered by the catalog entry.
 Always answer by calling the report_plate tool.`;
 
 const TOOL = {
@@ -35,11 +52,12 @@ const TOOL = {
           type: 'object',
           properties: {
             id: { type: 'integer', description: 'CATALOG number, or 0 if no match' },
-            seen: { type: 'string', description: 'Short description of what you see (language as requested)' },
-            grams: { type: 'number', description: 'Estimated edible grams on the plate' },
+            seen: { type: 'string', description: 'Short name of the dish you see (language as requested)' },
+            basis: { type: 'string', description: 'How you sized it: count x unit weight or volume comparison, in English, max 12 words' },
+            grams: { type: 'number', description: 'Edible grams derived from basis, after correcting for overestimation' },
             confidence: { type: 'number' },
           },
-          required: ['id', 'seen', 'grams', 'confidence'],
+          required: ['id', 'seen', 'basis', 'grams', 'confidence'],
         },
       },
       problem: { type: 'string', enum: ['none', 'no_food', 'unclear'] },
@@ -102,7 +120,7 @@ export default {
     const catalog = names.map((n, i) => `${i + 1}. ${n}`).join('\n');
     const req = {
       model: MODEL,
-      max_tokens: 900,
+      max_tokens: 1200,
       system: [{ type: 'text', text: SYSTEM }, { type: 'text', text: 'CATALOG:\n' + catalog, cache_control: { type: 'ephemeral' } }],
       tools: [TOOL],
       tool_choice: { type: 'tool', name: 'report_plate' },
