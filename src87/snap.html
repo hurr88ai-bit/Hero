@@ -1,0 +1,40 @@
+<div id="snap" class="bc snap" hidden role="dialog" aria-modal="true" aria-label="صوّر صحنك">
+  <div class="bc-top">
+    <button type="button" class="bc-x" onclick="SNAP.close()" aria-label="إغلاق">✕</button>
+    <div class="bc-title">صوّر صحنك</div>
+    <span class="bc-x" style="visibility:hidden" aria-hidden="true"></span>
+  </div>
+  <div id="snap-pick" class="snap-pick">
+    <div class="snap-hero" aria-hidden="true">🍽️</div>
+    <p class="snap-lead">صوّر الصحن من فوك، وهيرو يعرف الأكل ويقدّر الكمية والسعرات.</p>
+    <ul class="snap-tips">
+      <li>خلي الصحن كامل بالصورة، وبضو زين</li>
+      <li>إذا عندك ملعقة أو صمونة جنب الصحن، تساعد بتقدير الحجم</li>
+    </ul>
+    <label class="bc-photo snap-main">📸 صوّر الصحن<input type="file" accept="image/*" capture="environment" onchange="SNAP.photo(this)"></label>
+    <label class="bc-photo">🖼️ اختار صورة من الاستوديو<input type="file" accept="image/*" onchange="SNAP.photo(this)"></label>
+    <div class="bc-msg" id="snap-msg" role="status"></div>
+    <div class="snap-left" id="snap-left" hidden>باقيلك اليوم: <b id="snap-left-n" data-no-tr></b> صور</div>
+    <div class="snap-priv">🔒 الصورة تنرسل للتحليل بس، وما تنحفظ بأي مكان.</div>
+  </div>
+  <div id="snap-wait" class="snap-wait" hidden>
+    <img id="snap-img" class="snap-img" alt="">
+    <div class="bc-spin"></div>
+    <div>هيرو دا يشوف صحنك…</div>
+  </div>
+  <div id="snap-res" class="bc-res snap-res" hidden>
+    <div class="snap-h">هذا اللي شفناه بصحنك</div>
+    <div class="goal-note" style="margin-top:0;">تقدير من الصورة، مو وزن دقيق. صحّح الغرامات إذا تعرفها، واحذف أي شي غلط.</div>
+    <div id="snap-list"></div>
+    <button type="button" class="ghost snap-oil" onclick="SNAP.oil()">🫗 الأكل مدهّن؟ ضيف ملعقة دهن</button>
+    <div class="totals snap-tot">
+      <div><b id="snap-cal" data-no-tr>0</b><span>سعرة</span></div>
+      <div><b id="snap-pro" data-no-tr>0</b><span>بروتين</span></div>
+      <div><b id="snap-carb" data-no-tr>0</b><span>كارب</span></div>
+      <div><b id="snap-fat" data-no-tr>0</b><span>دهون</span></div>
+    </div>
+    <button type="button" class="primary" id="snap-add" onclick="SNAP.add()">+ ضيفها للوجبة</button>
+    <button type="button" class="ghost bc-again" onclick="SNAP.again()">صوّر مرة ثانية</button>
+    <div class="goal-note snap-src">السعرات محسوبة من قاعدة أكل هيرو (USDA وتقديرات الأكلات المحلية).<span id="snap-res-left" hidden> باقيلك اليوم: <b id="snap-res-left-n" data-no-tr></b> صور.</span></div>
+  </div>
+</div>

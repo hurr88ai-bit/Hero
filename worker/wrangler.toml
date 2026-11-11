@@ -1,0 +1,10 @@
+name = "hero-snap"
+main = "snap-worker.js"
+compatibility_date = "2026-11-01"
+
+[vars]
+DAILY_LIMIT = "5"
+
+[[kv_namespaces]]
+binding = "SNAP_KV"
+id = "PUT_KV_NAMESPACE_ID_HERE"
