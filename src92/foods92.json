@@ -1,0 +1,706 @@
+[
+ {
+  "name": "مرق سبانغ باللحم",
+  "en": "Spinach stew with meat",
+  "cal": 110.0,
+  "pro": 6.8,
+  "carb": 3.3,
+  "fat": 8.1,
+  "src": "E",
+  "piece": null,
+  "meas": "STEW",
+  "cat": "مرگات"
+ },
+ {
+  "name": "مرق فاصوليا خضراء باللحم",
+  "en": "Green bean stew with meat",
+  "cal": 100.0,
+  "pro": 5.5,
+  "carb": 5.7,
+  "fat": 6.5,
+  "src": "E",
+  "piece": null,
+  "meas": "STEW",
+  "cat": "مرگات"
+ },
+ {
+  "name": "مرق قيمة",
+  "en": "Qeema (split chickpea & meat stew)",
+  "cal": 157.0,
+  "pro": 8.2,
+  "carb": 11.3,
+  "fat": 8.9,
+  "src": "E",
+  "piece": null,
+  "meas": "STEW",
+  "cat": "مرگات"
+ },
+ {
+  "name": "مرق شجر (كوسا) باللحم",
+  "en": "Zucchini stew with meat",
+  "cal": 93.0,
+  "pro": 5.3,
+  "carb": 3.8,
+  "fat": 6.6,
+  "src": "E",
+  "piece": null,
+  "meas": "STEW",
+  "cat": "مرگات"
+ },
+ {
+  "name": "مرق بطاطا باللحم",
+  "en": "Potato stew with meat",
+  "cal": 121.0,
+  "pro": 5.5,
+  "carb": 11.5,
+  "fat": 6.1,
+  "src": "E",
+  "piece": null,
+  "meas": "STEW",
+  "cat": "مرگات"
+ },
+ {
+  "name": "مرق لوبيا باللحم",
+  "en": "Black-eyed pea stew with meat",
+  "cal": 138.0,
+  "pro": 8.6,
+  "carb": 13.6,
+  "fat": 5.7,
+  "src": "E",
+  "piece": null,
+  "meas": "STEW",
+  "cat": "مرگات"
+ },
+ {
+  "name": "مرق كرفس باللحم",
+  "en": "Celery stew with meat",
+  "cal": 94.0,
+  "pro": 5.1,
+  "carb": 2.8,
+  "fat": 6.9,
+  "src": "E",
+  "piece": null,
+  "meas": "STEW",
+  "cat": "مرگات"
+ },
+ {
+  "name": "مرق دجاج بالخضار",
+  "en": "Chicken & vegetable stew",
+  "cal": 87.0,
+  "pro": 7.1,
+  "carb": 7.2,
+  "fat": 3.3,
+  "src": "E",
+  "piece": null,
+  "meas": "STEW",
+  "cat": "مرگات"
+ },
+ {
+  "name": "فسنجون بالدجاج",
+  "en": "Fesenjan (walnut-pomegranate chicken)",
+  "cal": 228.0,
+  "pro": 13.2,
+  "carb": 11.4,
+  "fat": 15.1,
+  "src": "E",
+  "piece": null,
+  "meas": "STEW",
+  "cat": "مرگات"
+ },
+ {
+  "name": "تبسي باذنجان",
+  "en": "Tepsi (baked eggplant casserole)",
+  "cal": 189.0,
+  "pro": 6.8,
+  "carb": 8.6,
+  "fat": 14.6,
+  "src": "E",
+  "piece": null,
+  "meas": [
+   [
+    "ماعون",
+    300
+   ]
+  ],
+  "cat": "مرگات"
+ },
+ {
+  "name": "قوزي على تمن",
+  "en": "Quzi (lamb over rice)",
+  "cal": 218.0,
+  "pro": 8.4,
+  "carb": 22.2,
+  "fat": 10.4,
+  "src": "E",
+  "piece": null,
+  "meas": "RICE",
+  "cat": "أكلات رئيسية"
+ },
+ {
+  "name": "برياني عراقي بالدجاج",
+  "en": "Iraqi chicken biryani",
+  "cal": 192.0,
+  "pro": 7.8,
+  "carb": 23.7,
+  "fat": 7.2,
+  "src": "E",
+  "piece": null,
+  "meas": "RICE",
+  "cat": "أكلات رئيسية"
+ },
+ {
+  "name": "مقلوبة (باذنجان ودجاج)",
+  "en": "Maqluba (eggplant & chicken)",
+  "cal": 172.0,
+  "pro": 6.4,
+  "carb": 19.1,
+  "fat": 7.7,
+  "src": "E",
+  "piece": null,
+  "meas": "RICE",
+  "cat": "أكلات رئيسية"
+ },
+ {
+  "name": "تمن أحمر",
+  "en": "Red rice (tomato rice)",
+  "cal": 181.0,
+  "pro": 2.9,
+  "carb": 31.0,
+  "fat": 4.7,
+  "src": "E",
+  "piece": null,
+  "meas": "RICE",
+  "cat": "أكلات رئيسية"
+ },
+ {
+  "name": "تمن وماش",
+  "en": "Rice with mung beans",
+  "cal": 172.0,
+  "pro": 4.9,
+  "carb": 28.7,
+  "fat": 4.1,
+  "src": "E",
+  "piece": null,
+  "meas": "RICE",
+  "cat": "أكلات رئيسية"
+ },
+ {
+  "name": "مجدرة (عدس ورز)",
+  "en": "Mujaddara (lentils & rice)",
+  "cal": 194.0,
+  "pro": 6.1,
+  "carb": 28.6,
+  "fat": 6.3,
+  "src": "E",
+  "piece": null,
+  "meas": "RICE",
+  "cat": "أكلات رئيسية"
+ },
+ {
+  "name": "كبة موصلية (حبة)",
+  "en": "Mosul kubba (piece)",
+  "cal": 239.0,
+  "pro": 12.4,
+  "carb": 24.8,
+  "fat": 10.7,
+  "src": "E",
+  "piece": 200,
+  "meas": null,
+  "cat": "أكلات رئيسية"
+ },
+ {
+  "name": "كبة حامض (شلغم وشوندر)",
+  "en": "Sour kubba soup (turnip & beet)",
+  "cal": 96.0,
+  "pro": 3.5,
+  "carb": 14.1,
+  "fat": 2.8,
+  "src": "E",
+  "piece": null,
+  "meas": "STEW",
+  "cat": "أكلات رئيسية"
+ },
+ {
+  "name": "كبة بتيتة (حبة)",
+  "en": "Potato kubba (piece)",
+  "cal": 216.0,
+  "pro": 7.7,
+  "carb": 17.6,
+  "fat": 12.9,
+  "src": "E",
+  "piece": 80,
+  "meas": null,
+  "cat": "أكلات رئيسية"
+ },
+ {
+  "name": "شيخ محشي",
+  "en": "Sheikh mahshi (stuffed eggplant)",
+  "cal": 165.0,
+  "pro": 7.1,
+  "carb": 5.4,
+  "fat": 13.2,
+  "src": "E",
+  "piece": null,
+  "meas": [
+   [
+    "ماعون",
+    300
+   ]
+  ],
+  "cat": "أكلات رئيسية"
+ },
+ {
+  "name": "باقلاء بالدهن (بدون خبز)",
+  "en": "Broad beans with ghee & egg (no bread)",
+  "cal": 160.0,
+  "pro": 9.1,
+  "carb": 17.6,
+  "fat": 6.4,
+  "src": "E",
+  "piece": null,
+  "meas": [
+   [
+    "ماعون",
+    300
+   ]
+  ],
+  "cat": "أكلات رئيسية"
+ },
+ {
+  "name": "سمك مطبگ (سمك وتمن)",
+  "en": "Mutabbag (fish over rice)",
+  "cal": 185.0,
+  "pro": 11.0,
+  "carb": 17.8,
+  "fat": 7.3,
+  "src": "E",
+  "piece": null,
+  "meas": "RICE",
+  "cat": "أكلات رئيسية"
+ },
+ {
+  "name": "مخلمة",
+  "en": "Makhlama (eggs with meat & tomato)",
+  "cal": 147.0,
+  "pro": 9.6,
+  "carb": 3.1,
+  "fat": 10.6,
+  "src": "E",
+  "piece": null,
+  "meas": [
+   [
+    "ماعون",
+    300
+   ]
+  ],
+  "cat": "ريوگ"
+ },
+ {
+  "name": "عجة (قطعة)",
+  "en": "Ujja omelette (piece)",
+  "cal": 205.0,
+  "pro": 9.7,
+  "carb": 5.9,
+  "fat": 15.8,
+  "src": "E",
+  "piece": 55,
+  "meas": null,
+  "cat": "ريوگ"
+ },
+ {
+  "name": "طماطة ببيض",
+  "en": "Eggs with tomato",
+  "cal": 103.0,
+  "pro": 4.7,
+  "carb": 4.6,
+  "fat": 7.6,
+  "src": "E",
+  "piece": null,
+  "meas": [
+   [
+    "ماعون",
+    330
+   ]
+  ],
+  "cat": "ريوگ"
+ },
+ {
+  "name": "كاهي وقيمر بالدبس (صحن)",
+  "en": "Kahi with qaimar & date syrup (plate)",
+  "cal": 417.0,
+  "pro": 4.7,
+  "carb": 36.9,
+  "fat": 28.0,
+  "src": "E",
+  "piece": 150,
+  "meas": null,
+  "cat": "ريوگ"
+ },
+ {
+  "name": "صمونة فلافل",
+  "en": "Falafel samoon sandwich",
+  "cal": 271.0,
+  "pro": 9.8,
+  "carb": 35.0,
+  "fat": 10.7,
+  "src": "E",
+  "piece": 230,
+  "meas": null,
+  "cat": "ريوگ"
+ },
+ {
+  "name": "عروگ (حبة)",
+  "en": "Aroug (piece)",
+  "cal": 295.0,
+  "pro": 11.7,
+  "carb": 19.3,
+  "fat": 18.9,
+  "src": "E",
+  "piece": 50,
+  "meas": null,
+  "cat": "ريوگ"
+ },
+ {
+  "name": "سمبوسة لحم مقلية (حبة)",
+  "en": "Fried meat sambusa (piece)",
+  "cal": 290.0,
+  "pro": 8.0,
+  "carb": 28.0,
+  "fat": 16.0,
+  "src": "E",
+  "piece": 40,
+  "meas": null,
+  "cat": "ريوگ"
+ },
+ {
+  "name": "شوربة دجاج",
+  "en": "Chicken soup",
+  "cal": 44.0,
+  "pro": 3.6,
+  "carb": 4.5,
+  "fat": 1.2,
+  "src": "E",
+  "piece": null,
+  "meas": [
+   [
+    "ماعون",
+    300
+   ]
+  ],
+  "cat": "شوربات"
+ },
+ {
+  "name": "شوربة خضار",
+  "en": "Vegetable soup",
+  "cal": 32.0,
+  "pro": 0.8,
+  "carb": 5.2,
+  "fat": 1.1,
+  "src": "E",
+  "piece": null,
+  "meas": [
+   [
+    "ماعون",
+    300
+   ]
+  ],
+  "cat": "شوربات"
+ },
+ {
+  "name": "هريسة",
+  "en": "Harees (wheat & chicken)",
+  "cal": 95.0,
+  "pro": 7.1,
+  "carb": 10.0,
+  "fat": 3.0,
+  "src": "E",
+  "piece": null,
+  "meas": [
+   [
+    "ماعون",
+    300
+   ]
+  ],
+  "cat": "شوربات"
+ },
+ {
+  "name": "شوربة ماش",
+  "en": "Mung bean soup",
+  "cal": 70.0,
+  "pro": 3.6,
+  "carb": 11.4,
+  "fat": 1.3,
+  "src": "E",
+  "piece": null,
+  "meas": [
+   [
+    "ماعون",
+    300
+   ]
+  ],
+  "cat": "شوربات"
+ },
+ {
+  "name": "برگر لحم (سندويچ)",
+  "en": "Beef burger (sandwich)",
+  "cal": 250.0,
+  "pro": 12.5,
+  "carb": 30.0,
+  "fat": 9.0,
+  "src": "E",
+  "piece": 180,
+  "meas": null,
+  "cat": "أكل سريع"
+ },
+ {
+  "name": "سندويچ زنگر / دجاج مقلي",
+  "en": "Zinger / fried chicken sandwich",
+  "cal": 250.0,
+  "pro": 13.0,
+  "carb": 25.0,
+  "fat": 11.0,
+  "src": "E",
+  "piece": 220,
+  "meas": null,
+  "cat": "أكل سريع"
+ },
+ {
+  "name": "بيتزا جبن (قطعة)",
+  "en": "Cheese pizza (slice)",
+  "cal": 266.0,
+  "pro": 11.4,
+  "carb": 33.3,
+  "fat": 9.7,
+  "src": "U",
+  "piece": 107,
+  "meas": null,
+  "cat": "أكل سريع"
+ },
+ {
+  "name": "دجاج بروستد (مقلي بالعجينة)",
+  "en": "Broasted chicken (battered, fried)",
+  "cal": 289.0,
+  "pro": 22.5,
+  "carb": 9.4,
+  "fat": 17.4,
+  "src": "U",
+  "piece": null,
+  "meas": [
+   [
+    "كف يد",
+    100
+   ]
+  ],
+  "cat": "أكل سريع"
+ },
+ {
+  "name": "لفة دجاج بالصاج مع صوص",
+  "en": "Chicken saj wrap with sauce",
+  "cal": 220.0,
+  "pro": 12.0,
+  "carb": 22.0,
+  "fat": 9.0,
+  "src": "E",
+  "piece": 250,
+  "meas": null,
+  "cat": "أكل سريع"
+ },
+ {
+  "name": "مايونيز",
+  "en": "Mayonnaise",
+  "cal": 680.0,
+  "pro": 1.0,
+  "carb": 0.6,
+  "fat": 75.0,
+  "src": "U",
+  "piece": null,
+  "meas": [
+   [
+    "ملعقة أكل",
+    14
+   ]
+  ],
+  "cat": "أكل سريع"
+ },
+ {
+  "name": "كاتشب",
+  "en": "Ketchup",
+  "cal": 101.0,
+  "pro": 1.0,
+  "carb": 27.0,
+  "fat": 0.1,
+  "src": "U",
+  "piece": null,
+  "meas": [
+   [
+    "ملعقة أكل",
+    17
+   ]
+  ],
+  "cat": "أكل سريع"
+ },
+ {
+  "name": "ثومية (صوص ثوم)",
+  "en": "Toum (garlic sauce)",
+  "cal": 600.0,
+  "pro": 1.0,
+  "carb": 4.0,
+  "fat": 65.0,
+  "src": "E",
+  "piece": null,
+  "meas": [
+   [
+    "ملعقة أكل",
+    15
+   ]
+  ],
+  "cat": "أكل سريع"
+ },
+ {
+  "name": "محلبي",
+  "en": "Mahallabi (milk pudding)",
+  "cal": 110.0,
+  "pro": 2.8,
+  "carb": 18.4,
+  "fat": 2.9,
+  "src": "E",
+  "piece": null,
+  "meas": [
+   [
+    "كاسة",
+    150
+   ]
+  ],
+  "cat": "حلويات"
+ },
+ {
+  "name": "كاستر",
+  "en": "Custard",
+  "cal": 109.0,
+  "pro": 3.3,
+  "carb": 16.9,
+  "fat": 3.3,
+  "src": "E",
+  "piece": null,
+  "meas": [
+   [
+    "كاسة",
+    150
+   ]
+  ],
+  "cat": "حلويات"
+ },
+ {
+  "name": "حلاوة جزر",
+  "en": "Carrot halwa",
+  "cal": 272.0,
+  "pro": 1.7,
+  "carb": 44.7,
+  "fat": 10.7,
+  "src": "E",
+  "piece": null,
+  "meas": [
+   [
+    "ملعقة أكل",
+    20
+   ],
+   [
+    "صحن صغير",
+    100
+   ]
+  ],
+  "cat": "حلويات"
+ },
+ {
+  "name": "داطلي (قطعة)",
+  "en": "Datli (semolina syrup cake, piece)",
+  "cal": 340.0,
+  "pro": 5.0,
+  "carb": 60.0,
+  "fat": 10.0,
+  "src": "E",
+  "piece": 60,
+  "meas": null,
+  "cat": "حلويات"
+ },
+ {
+  "name": "شاي حامض (نومي بصرة) بسكر (استكان)",
+  "en": "Dried-lime tea with sugar (tea glass)",
+  "cal": 35.0,
+  "pro": 0.0,
+  "carb": 9.0,
+  "fat": 0.0,
+  "src": "E",
+  "piece": 100,
+  "meas": null,
+  "cat": "مشروبات"
+ },
+ {
+  "name": "مشروب طاقة",
+  "en": "Energy drink",
+  "cal": 45.0,
+  "pro": 0.5,
+  "carb": 11.0,
+  "fat": 0.0,
+  "src": "U",
+  "piece": null,
+  "meas": [
+   [
+    "قوطية 250 مل",
+    255
+   ]
+  ],
+  "cat": "مشروبات"
+ },
+ {
+  "name": "عصير ليمون بالنعناع (محلات)",
+  "en": "Lemon-mint juice (shop)",
+  "cal": 60.0,
+  "pro": 0.1,
+  "carb": 15.0,
+  "fat": 0.1,
+  "src": "E",
+  "piece": null,
+  "meas": [
+   [
+    "كوب",
+    250
+   ]
+  ],
+  "cat": "مشروبات"
+ },
+ {
+  "name": "عصير موز بالحليب",
+  "en": "Banana milkshake",
+  "cal": 90.0,
+  "pro": 2.3,
+  "carb": 16.8,
+  "fat": 2.0,
+  "src": "E",
+  "piece": null,
+  "meas": [
+   [
+    "كوب",
+    340
+   ]
+  ],
+  "cat": "مشروبات"
+ },
+ {
+  "name": "عصير فواكه كوكتيل (محلات)",
+  "en": "Fruit cocktail juice (shop)",
+  "cal": 60.0,
+  "pro": 0.6,
+  "carb": 14.0,
+  "fat": 0.3,
+  "src": "E",
+  "piece": null,
+  "meas": [
+   [
+    "كوب",
+    300
+   ]
+  ],
+  "cat": "مشروبات"
+ }
+]
