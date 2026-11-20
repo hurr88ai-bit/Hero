@@ -46,7 +46,8 @@ def main():
 
     sw = open(SW, encoding='utf-8').read()
     core = json.loads(re.search(r'const CORE = (\[.*?\]);', sw).group(1))
-    missing = [f for f in core[1:] if not os.path.exists(os.path.join(ROOT, path_of(f)))]
+    data = list(json.loads(re.search(r'const DATA = (\{.*?\});', sw).group(1)))
+    missing = [f for f in core[1:] + data if not os.path.exists(os.path.join(ROOT, path_of(f)))]
     if missing:
         die('ملفات بقائمة الـservice worker مو موجودة: ' + ', '.join(missing))
 
@@ -75,6 +76,9 @@ def main():
     for f in core[1:]:
         h.update(open(os.path.join(ROOT, path_of(f)), 'rb').read())
     cache = f'hero-{new}-{h.hexdigest()[:8]}'
+    dh = {f: hashlib.sha1(open(os.path.join(ROOT, path_of(f)), 'rb').read()).hexdigest()[:16] for f in data}   # بصمة كل ملف بيانات (الترحيل من كاش قديم يتحقق منها)
+    sw = re.sub(r"const DATA = \{.*?\};", lambda m: 'const DATA = ' + json.dumps(dh) + ';', sw, count=1)
+    sw = re.sub(r"const DATA_CACHE = '[^']+';", "const DATA_CACHE = 'hero-data-" + hashlib.sha1(json.dumps(dh, sort_keys=True).encode()).hexdigest()[:8] + "';", sw, count=1)
     sw = re.sub(r"const CACHE = '[^']+';", f"const CACHE = '{cache}';", sw, count=1)
     open(SW, 'w', encoding='utf-8').write(sw)
     print(f'✓ نسخة {cur} ← {new} · ذاكرة الـservice worker: {cache}')

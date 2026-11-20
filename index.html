@@ -843,6 +843,9 @@
 if('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')){
   window.addEventListener('load', ()=>{
     navigator.serviceWorker.register('sw.js').then(reg=>{
+      setTimeout(()=>{   // بعد ما يفتح التطبيق: نكمل أي ملف بيانات ناقص (مثلاً انقطع النت وقت التثبيت؛ نتخطى توفير البيانات والشبكات البطيئة)
+        try{ const cn = navigator.connection; if(cn && (cn.saveData || /(^|-)2g$/.test(cn.effectiveType || ''))) return; navigator.serviceWorker.ready.then(r=>{ if(r.active) r.active.postMessage({type:'prefetch-data'}); }); }catch(e){}
+      }, 6000);
       reg.addEventListener('updatefound', ()=>{ const w = reg.installing; if(!w) return;
         w.addEventListener('statechange', ()=>{ if(w.state === 'installed' && navigator.serviceWorker.controller && typeof notify === 'function') notify('نزل تحديث جديد لهيرو ✨ سكّر التطبيق وافتحه حتى يشتغل'); });
       });

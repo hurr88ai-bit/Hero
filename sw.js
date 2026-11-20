@@ -1,10 +1,59 @@
 // هيرو · service worker (يخلي التطبيق يشتغل بدون نت ويحدّث نفسه)
 const CACHE = 'hero-111-bb8f1ede';
-const CORE = ["./", "index.html", "app.css?v=111", "app-i18n.js?v=111", "app-main.js?v=111", "app-extra.js?v=111", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-180.png", "icons/icon-32.png", "vendor/three.module.min.js", "vendor/jsm/environments/RoomEnvironment.js", "coach-mh.js", "real.js", "anat.js", "body-meta.json", "body-shared.txt", "body-m.txt", "body-f.txt", "muscles-m.txt", "muscles-f.txt", "fonts/ibm-plex-sans-arabic-arabic-400-normal.woff2", "fonts/ibm-plex-sans-arabic-arabic-500-normal.woff2", "fonts/ibm-plex-sans-arabic-arabic-600-normal.woff2", "fonts/ibm-plex-sans-arabic-arabic-700-normal.woff2", "fonts/ibm-plex-sans-arabic-latin-400-normal.woff2", "fonts/ibm-plex-sans-arabic-latin-500-normal.woff2", "fonts/ibm-plex-sans-arabic-latin-600-normal.woff2", "fonts/ibm-plex-sans-arabic-latin-700-normal.woff2", "privacy.html", "terms.html", "media/coach-m.webp", "media/coach-f.webp", "fonts/hero-cuneiform.woff2", "media/hero-face.webp", "media/hero-full.webp"];
-self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE))); self.skipWaiting(); });
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE && k.startsWith('hero-') && k !== 'hero-fonts' && k !== 'hero-prefs').map(k => caches.delete(k)))).then(() => self.clients.claim()));
+const DATA_CACHE = 'hero-data-2dac938b';   // ملفات المدرب 3D الثقيلة: كاش مستقل ودائم، اسمه يتغيّر بس إذا تغيّرت هي نفسها (release.py)
+const CORE = ["./", "index.html", "app.css?v=111", "app-i18n.js?v=111", "app-main.js?v=111", "app-extra.js?v=111", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-180.png", "icons/icon-32.png", "coach-mh.js", "real.js", "anat.js", "fonts/ibm-plex-sans-arabic-arabic-400-normal.woff2", "fonts/ibm-plex-sans-arabic-arabic-500-normal.woff2", "fonts/ibm-plex-sans-arabic-arabic-600-normal.woff2", "fonts/ibm-plex-sans-arabic-arabic-700-normal.woff2", "fonts/ibm-plex-sans-arabic-latin-400-normal.woff2", "fonts/ibm-plex-sans-arabic-latin-500-normal.woff2", "fonts/ibm-plex-sans-arabic-latin-600-normal.woff2", "fonts/ibm-plex-sans-arabic-latin-700-normal.woff2", "privacy.html", "terms.html", "media/coach-m.webp", "media/coach-f.webp", "fonts/hero-cuneiform.woff2", "media/hero-face.webp", "media/hero-full.webp"];
+const DATA = {"vendor/three.module.min.js": "2992ecd75d9d9774", "vendor/jsm/environments/RoomEnvironment.js": "597308a0499629db", "body-meta.json": "f94be097304a27db", "body-shared.txt": "b0a63f6d39502ddf", "body-m.txt": "9805e4a4275a0c14", "body-f.txt": "453d9e72a2bda285", "muscles-m.txt": "699f5477350c874a", "muscles-f.txt": "206d5b4829000391"};   // ملف ← بصمته (SHA-1 أول 16 حرف)؛ release.py يحدّثها. الترحيل من كاش قديم ينسخ بس الملف اللي بصمته تطابق
+const DATA_FILES = Object.keys(DATA);
+const DATA_URLS = new Set(DATA_FILES.map(f => new URL(f, self.location).pathname));
+const OLD_RE = /^hero-\d+-/, OLD_DATA_RE = /^hero-data-/;
+const timeout = ms => new Promise(r => setTimeout(r, ms));
+async function sha16(res){   // بصمة محتوى الاستجابة (نفس صيغة release.py)
+  const d = new Uint8Array(await crypto.subtle.digest('SHA-1', await res.clone().arrayBuffer()));
+  return [...d.slice(0, 8)].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+const isOld = k => k !== CACHE && k !== DATA_CACHE && (OLD_RE.test(k) || OLD_DATA_RE.test(k));
+// يضمن ملفات البيانات الثقيلة بالكاش الدائم: يرحّل من أي ذاكرة قديمة (نسخة أو بيانات) بس إذا بصمة الملف تطابق (حتى ملف متغيّر ما ينسخ قديم)، وإلا ينزّله بمهلة. فشل ملف ما يوقف الباقي ولا يفشّل التثبيت
+async function ensureData(){
+  const dc = await caches.open(DATA_CACHE), ks = (await caches.keys()).filter(isOld);
+  for(const f of DATA_FILES){
+    const u = new URL(f, self.location).href;
+    if(await dc.match(u)) continue;
+    let done = false;
+    for(const k of ks){
+      try{
+        const r = await (await caches.open(k)).match(u);
+        if(r && await sha16(r) === DATA[f]){ await dc.put(u, r); done = true; break; }
+      }catch(err){}
+    }
+    if(done) continue;
+    const ac = typeof AbortController === 'function' ? new AbortController() : null, tm = ac ? setTimeout(() => ac.abort(), 30000) : 0;
+    try{ const n = await fetch(u, ac ? {signal: ac.signal} : undefined); if(n.ok) await dc.put(u, n); }catch(err){ /* انقطع النت أو تأخر: نكمل بالمحاولة الجاية (رسالة الصفحة أو الاستعمال) */ }
+    finally{ if(tm) clearTimeout(tm); }
+  }
+}
+let dataBusy = null;
+function ensureDataOnce(){ return dataBusy || (dataBusy = ensureData().catch(() => {}).finally(() => { dataBusy = null; })); }
+self.addEventListener('install', e => {
+  e.waitUntil((async () => { await (await caches.open(CACHE)).addAll(CORE); await Promise.race([ensureDataOnce(), timeout(90000)]); })());   // سقف 90 ثانية: تنزيل معلّق ما يوقف التثبيت
+  self.skipWaiting();
 });
+self.addEventListener('activate', e => {
+  e.waitUntil((async () => {
+    await Promise.race([ensureDataOnce(), timeout(30000)]);   // يرحّل أي ملف بيانات ناقص من القديم قبل ما نمسحه
+    const ks = await caches.keys(), dc = await caches.open(DATA_CACHE), missing = [];
+    for(const f of DATA_FILES){ const u = new URL(f, self.location).href; if(!(await dc.match(u))) missing.push(u); }
+    const del = [];
+    for(const k of ks){
+      if(k === CACHE || k === DATA_CACHE || !k.startsWith('hero-') || k === 'hero-fonts' || k === 'hero-prefs') continue;
+      let only = false;   // ذاكرة قديمة فيها النسخة الوحيدة لملف بيانات ما انرحّل: نخليها
+      if((OLD_RE.test(k) || OLD_DATA_RE.test(k)) && missing.length){ try{ const oc = await caches.open(k); for(const u of missing){ if(await oc.match(u)){ only = true; break; } } }catch(err){ only = true; } }
+      if(!only) del.push(k);
+    }
+    await Promise.all(del.map(k => caches.delete(k)));
+    await self.clients.claim();
+  })());
+});
+self.addEventListener('message', e => { if(e.data && e.data.type === 'prefetch-data') e.waitUntil(ensureDataOnce()); });
 self.addEventListener('fetch', e => {
   const req = e.request; if (req.method !== 'GET') return;
   const url = new URL(req.url);
@@ -12,17 +61,17 @@ self.addEventListener('fetch', e => {
     e.respondWith(fetch(req).then(r => {
       // نخزّن الصفحة بس إذا ملفاتها المرقّمة (?v=) موجودة بهذي الذاكرة، حتى ما تنفتح صفحة جديدة بدون سكربتاتها لو انقطع النت قبل اكتمال التحديث
       const cp = r.clone();
-      cp.text().then(t => caches.open(CACHE).then(c => {
+      e.waitUntil(cp.text().then(t => caches.open(CACHE).then(c => {
         const refs = [...t.matchAll(/(?:src|href)="(app[\w-]*\.(?:js|css)\?v=\d+)"/g)].map(m => m[1]);
         return Promise.all(refs.map(u => c.match(u))).then(hits => { if (hits.every(Boolean)) c.put('index.html', new Response(t, {headers: {'content-type': 'text/html; charset=utf-8'}})); });
-      })).catch(() => {});
+      })).catch(() => {}));
       return r;
     })
       .catch(() => caches.match('index.html')));
     return;
   }
-  if (url.origin === location.origin && url.pathname.includes('/vendor/zxing/')) {   // قارئ الباركود: ينحفظ أول مرة ينستعمل
-    e.respondWith(caches.match(req, {ignoreSearch: true}).then(r => r || fetch(req).then(res => { if (res.ok) { const cp = res.clone(); caches.open(CACHE).then(c => c.put(req, cp)); } return res; })));
+  if (url.origin === location.origin && (url.pathname.includes('/vendor/zxing/') || DATA_URLS.has(url.pathname))) {   // قارئ الباركود وملفات المدرب الثقيلة: من الكاش الدائم، وإذا ماكو تنحفظ أول مرة تنستعمل
+    e.respondWith(caches.open(DATA_CACHE).then(c => c.match(req, {ignoreSearch: true}).then(r => r || fetch(req).then(res => { if (res.ok) e.waitUntil(c.put(req, res.clone())); return res; }))));
     return;
   }
   if (url.origin === location.origin) {   // ملفات التطبيق المرقّمة (?v=) تنطابق حرفياً: صفحة جديدة ما تاخذ سكربت قديم من الذاكرة
