@@ -52,7 +52,7 @@ function dueSlot(reminders, tz, last, date){
   const now = localNow(tz, date);
   let best = null;
   for(const r of reminders){
-    const rmin = Math.floor((r.h * 60 + r.m) / SLOT_MIN) * SLOT_MIN;
+    const rmin = Math.min(1440 - SLOT_MIN, Math.ceil((r.h * 60 + r.m) / SLOT_MIN) * SLOT_MIN);   // نقرّب للأعلى: التذكير يوصل بعد الوقت اللي اخترته مو قبله
     const diff = now.min - rmin;
     if(diff < 0 || diff > CATCHUP_MIN) continue;
     const key = now.day + String(Math.floor(rmin / 60)).padStart(2, '0') + String(rmin % 60).padStart(2, '0');

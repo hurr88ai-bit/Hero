@@ -47,7 +47,7 @@ self.addEventListener('push', e => {
   e.waitUntil((async () => {
     const p = await heroPrefs(), L = REMIND[p.lang === 'en' ? 'en' : 'ar'], h = new Date().getHours();
     const m = h < 11 ? L.morning : h < 17 ? L.noon : L.evening;
-    await self.registration.showNotification(m[0], {body: m[1], icon: 'icons/icon-192.png', badge: 'icons/icon-32.png', tag: 'hero-reminder', data: {url: './'}});
+    await self.registration.showNotification(m[0], {body: m[1], icon: 'icons/icon-192.png', badge: 'icons/icon-32.png', tag: 'hero-reminder', renotify: true, data: {url: './'}});   // نفس الوسم يستبدل القديم، وrenotify يخلي البديل يطلع بلافتة وصوت مو بصمت
   })());
 });
 self.addEventListener('notificationclick', e => {

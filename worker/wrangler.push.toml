@@ -8,4 +8,4 @@ crons = ["*/5 * * * *"]
 [[d1_databases]]
 binding = "DB"
 database_name = "hero-push"
-database_id = "PUT_D1_DATABASE_ID_HERE"
+database_id = "a84c4839-7d8c-494d-bfda-a891d811da20"
