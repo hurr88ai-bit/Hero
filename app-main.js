@@ -1273,7 +1273,7 @@ function weekShareData(){
 }
 async function shareDrawWeek(d){
   const W = 1080, H = 1920, c = document.createElement('canvas'); c.width = W; c.height = H;
-  const x = c.getContext('2d'), en = shareEn(), S = d.S;
+  const x = c.getContext('2d'), en = shareEn(), S = d.S, N = d.n || 7;
   try{ await Promise.all(['40px HeroCun', '40px Lalezar', '700 40px "IBM Plex Sans Arabic"', '500 40px "IBM Plex Sans Arabic"'].map(f=>document.fonts.load(f, f.includes('HeroCun') ? '\u{12049}' : 'هيرو'))); }catch(e){}
   const g = x.createRadialGradient(W/2, H*.4, 60, W/2, H*.4, H*.8); g.addColorStop(0, '#244273'); g.addColorStop(1, '#0f1c34');
   x.fillStyle = g; x.fillRect(0, 0, W, H);
@@ -1300,8 +1300,8 @@ async function shareDrawWeek(d){
   const MON_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const range = en ? `${a.getDate()} ${MON_EN[a.getMonth()]} – ${b.getDate()} ${MON_EN[b.getMonth()]}` : `${a.getDate()} ${AR_MONTHS[a.getMonth()]} - ${b.getDate()} ${AR_MONTHS[b.getMonth()]}`;
   x.fillStyle = '#ffffff'; x.font = '700 50px "IBM Plex Sans Arabic"';
-  x.fillText(en ? (name ? `${name}'s week` : 'My week') : (name ? `أسبوع ${name}` : 'أسبوعي'), W/2, 570);
-  x.fillStyle = 'rgba(255,255,255,.65)'; x.font = '500 36px "IBM Plex Sans Arabic"'; x.fillText(range, W/2, 625);
+  x.fillText(d.month ? (en ? (name ? `${name}'s month` : 'My month') : (name ? `شهر ${name}` : 'شهري')) : en ? (name ? `${name}'s week` : 'My week') : (name ? `أسبوع ${name}` : 'أسبوعي'), W/2, 570);
+  x.fillStyle = 'rgba(255,255,255,.65)'; x.font = '500 36px "IBM Plex Sans Arabic"'; x.fillText(d.month ? (en ? `${MON_EN[d.ref.m]} ${d.ref.y}` : `${AR_MONTHS[d.ref.m]} ${d.ref.y}`) : range, W/2, 625);
   // حلقة النقاط
   const cy = 830, R = 150;
   x.lineCap = 'round'; x.lineWidth = 28;
@@ -1310,14 +1310,14 @@ async function shareDrawWeek(d){
   x.save(); x.direction = 'ltr'; x.fillStyle = '#ffffff'; x.font = '700 130px "IBM Plex Sans Arabic"'; x.fillText(String(d.sc), W/2, cy + 30);
   x.restore(); x.fillStyle = 'rgba(255,255,255,.6)'; x.font = '500 34px "IBM Plex Sans Arabic"'; x.fillText(en ? '/ 100' : 'من 100', W/2, cy + 82);
   x.fillStyle = '#ffc94d'; x.font = '700 54px "IBM Plex Sans Arabic"';
-  const msg = weekScoreMsg(d.sc); x.fillText(en && I18N.t ? I18N.t(msg) : msg, W/2, 1065);
+  const msg = d.month ? monthScoreMsg(d.sc) : weekScoreMsg(d.sc); x.fillText(en && I18N.t ? I18N.t(msg) : msg, W/2, 1065);
   // المربعات
   const tiles = [
-    ['📝', `${S.logged}/7`, en ? 'days logged' : 'أيام سجلت أكلي'],
-    S.hasT ? ['🎯', `${S.calDays}/7`, en ? 'days on target' : 'أيام ضمن هدفي'] : ['🔥', String(d.streak), en ? 'day streak' : 'يوم ورا بعض'],
+    ['📝', `${S.logged}/${N}`, en ? 'days logged' : 'أيام سجلت أكلي'],
+    S.hasT ? ['🎯', `${S.calDays}/${N}`, en ? 'days on target' : 'أيام ضمن هدفي'] : ['🔥', String(d.streak), en ? 'day streak' : 'يوم ورا بعض'],
     ['🏋️', `${S.workouts}`, en ? 'workouts' : 'حصص تمرين'],
-    ['💧', `${S.waterDays}/7`, en ? 'water goal days' : 'أيام هدف الماي'],
-    ['😴', `${S.sleepGood}/7`, en ? 'nights slept 7h+' : 'ليالي نوم كافي'],
+    ['💧', `${S.waterDays}/${N}`, en ? 'water goal days' : 'أيام هدف الماي'],
+    ['😴', `${S.sleepGood}/${N}`, en ? 'nights slept 7h+' : 'ليالي نوم كافي'],
     ['🔥', String(d.streak), en ? 'day streak' : 'يوم ورا بعض'],
   ];
   if(!S.hasT) tiles[5] = ['⭐', String(achStats().xp || 0), en ? 'total points' : 'مجموع نقاطي'];
@@ -1340,15 +1340,15 @@ async function shareDrawWeek(d){
   return await new Promise(r=>c.toBlob(r, 'image/png'));
 }
 async function shareOpen(kind, extra){
-  const d = kind === 'week' ? weekShareData() : shareData(kind, extra);
+  const d = kind === 'week' ? weekShareData() : kind === 'month' ? monthShareData() : shareData(kind, extra);
   if(!d){ notify(kind==='weight' ? 'سجّل وزنك مرتين على الأقل حتى نسوي بطاقة' : 'ما لكينا شي نشاركه بعد'); return; }
   trOpenSheet('شارك إنجازك', `<img class="share-prev" id="share-prev" alt="بطاقة الإنجاز"><div class="share-btns">
     <button type="button" class="gold" id="share-go" onclick="shareGo()" disabled>${'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>'}<span>شارك</span></button>
     <button type="button" class="ghost" onclick="shareSave()">نزّل الصورة</button></div>
     <div class="goal-note" style="text-align:center;">حطها ستوري وتاگ <b dir="ltr">@heroapp.iq</b> 💛</div>`, true);
-  SHARE.blob = await (kind === 'week' ? shareDrawWeek(d) : shareDraw(d)); if(SHARE.url) URL.revokeObjectURL(SHARE.url);
+  SHARE.blob = await (kind === 'week' || kind === 'month' ? shareDrawWeek(d) : shareDraw(d)); if(SHARE.url) URL.revokeObjectURL(SHARE.url);
   SHARE.url = URL.createObjectURL(SHARE.blob); SHARE.name = `hero-${kind}.png`;
-  SHARE.text = kind === 'week' ? (shareEn() ? 'My HERO week 💪 #HeroChallenge @heroapp.iq' : 'أسبوعي ويا هيرو 💪 #تحدي_هيرو @heroapp.iq')
+  SHARE.text = kind === 'month' ? (shareEn() ? 'My HERO month 💪 #HeroChallenge @heroapp.iq' : 'شهري ويا هيرو 💪 #تحدي_هيرو @heroapp.iq') : kind === 'week' ? (shareEn() ? 'My HERO week 💪 #HeroChallenge @heroapp.iq' : 'أسبوعي ويا هيرو 💪 #تحدي_هيرو @heroapp.iq')
     : shareEn() ? 'BE YOUR OWN HERO 💪 @heroapp.iq' : 'BE YOUR OWN HERO 💪 تابعوا @heroapp.iq';
   const im = document.getElementById('share-prev'); if(im) im.src = SHARE.url;
   const b = document.getElementById('share-go'); if(b) b.disabled = false;
@@ -3004,6 +3004,106 @@ function openWeekSummary(){
     <div class="ws-share"><button class="primary" onclick="shareOpen('week')">📤 شارك بطاقة أسبوعك</button></div>
     <div class="ws-ch">🏆 <b>تحدّي هيرو:</b> كل جمعة نزّل بطاقة أسبوعك ستوري، وسوّي تاگ <b dir="ltr">@heroapp.iq</b> ووياه أصدقائك. الأعلى نقاط يفوز.</div>
     <details class="ws-how"><summary>شلون تنحسب النقاط؟</summary>تسجيل الأكل 25 · التمارين 25 (حسب أيام برنامجك) · الماي 20 · الأكل ضمن هدفك 15 · النوم 7 ساعات أو أكثر 15. النقاط على الالتزام، مو على الوزن، حتى يكون التحدّي عادل للكل.</details>`);
+}
+
+// ================= v109: ملخص الشهر =================
+let MONTH_REF = null;
+function monthStats(y, m){
+  const dim = new Date(y, m+1, 0).getDate(), today = todayKey(), keys = [];
+  for(let d=1; d<=dim; d++){ const k = keyFromDate(new Date(y, m, d)); if(k<=today) keys.push(k); }
+  const n = keys.length, hasT = !!data.profile && !TRACK;
+  if(!n) return {y, m, n:0, keys, hasT, logged:0, cals:[], avgCal:0, avgPro:0, workouts:0, waterDays:0, avgSleep:0, sleepN:0, dW:null, calDays:0, sleepGood:0, trainGoal:1, bestStreak:0, startK:null, endK:null};
+  const startK = keys[0], endK = keys[n-1];
+  const dayTot = k=>(data.meals[k]||[]).reduce((a,x)=>{ const t = mealTotals(x); return {cal:a.cal+t.cal, pro:a.pro+t.pro}; }, {cal:0, pro:0});
+  const cals = keys.map(k=>dayTot(k).cal);
+  const loggedKeys = keys.filter(k=>(data.meals[k]||[]).length), tot = loggedKeys.map(dayTot);
+  const avgCal = tot.length ? tot.reduce((a,x)=>a+x.cal,0)/tot.length : 0, avgPro = tot.length ? tot.reduce((a,x)=>a+x.pro,0)/tot.length : 0;
+  const workouts = keys.reduce((a,k)=>a+((data.workouts||{})[k]||[]).length, 0);
+  const waterDays = keys.filter(k=>waterOf(k) >= waterTarget()).length;
+  const sl = keys.map(k=>num((data.sleep||{})[k])).filter(Boolean), avgSleep = sl.length ? sl.reduce((a,b)=>a+b,0)/sl.length : 0;
+  const ws = (data.weights||[]).filter(w=>w.date<=endK), inWin = ws.filter(w=>w.date>=startK), prev = ws.filter(w=>w.date<startK).pop();
+  let dW = null;
+  if(inWin.length && (prev || inWin.length>=2)) dW = inWin[inWin.length-1].w - (prev ? prev.w : inWin[0].w);
+  const calDays = hasT ? tot.filter(x=>x.cal >= CAL_MIN*0.9 && x.cal <= CAL_MAX).length : 0;
+  const sleepGood = sl.filter(h=>h>=7).length;
+  const prog = trPlan(), perWeek = prog ? Math.max(2, Math.min(prog.days.length, 6)) : 3, trainGoal = Math.max(1, Math.round(perWeek * n / 7));
+  let bestStreak = 0, run = 0;
+  keys.forEach(k=>{ if((data.meals[k]||[]).length){ run++; if(run > bestStreak) bestStreak = run; } else run = 0; });
+  return {y, m, n, keys, startK, endK, hasT, logged:loggedKeys.length, cals, avgCal, avgPro, workouts, waterDays, avgSleep, sleepN:sl.length, dW, calDays, sleepGood, trainGoal, bestStreak};
+}
+function monthScore(S){
+  if(!S.n) return 0;
+  const pts = S.logged/S.n*25 + Math.min(1, S.workouts/S.trainGoal)*25 + S.waterDays/S.n*20 + S.sleepGood/S.n*15 + (S.hasT ? S.calDays : S.logged)/S.n*15;
+  return Math.max(0, Math.min(100, Math.round(pts)));
+}
+function monthScoreMsg(sc){ return sc >= 85 ? 'شهر أبطال 🏆' : sc >= 65 ? 'شهر قوي 💪' : sc >= 40 ? 'بداية زينة، كمّل وتحسّن' : 'الشهر الجاي نشدّ حيلنا'; }
+function monthEarliest(){
+  const ks = [];
+  Object.keys(data.meals||{}).forEach(k=>{ if((data.meals[k]||[]).length) ks.push(k); });
+  Object.keys(data.workouts||{}).forEach(k=>{ if((data.workouts[k]||[]).length) ks.push(k); });
+  (data.weights||[]).forEach(w=>ks.push(w.date));
+  const v = ks.filter(k=>DATE_RE.test(k)).sort()[0];
+  if(!v) return null;
+  const d = dateFromKey(v); return {y:d.getFullYear(), m:d.getMonth()};
+}
+function monthChart(S){
+  if(!S.logged) return '';
+  const W = 300, H = 64, dim = new Date(S.y, S.m+1, 0).getDate(), bw = W/dim;
+  const mx = Math.max(S.hasT ? CAL_MAX*1.15 : 0, ...S.cals, 500), yy = v=>H - Math.min(1, v/mx)*H;
+  const band = S.hasT ? `<rect x="0" y="${yy(CAL_MAX).toFixed(1)}" width="${W}" height="${(yy(CAL_MIN)-yy(CAL_MAX)).toFixed(1)}" fill="#1f9d6b" opacity=".16"/>` : '';
+  const bars = S.cals.map((v,i)=>v>0 ? `<rect x="${(i*bw+1).toFixed(1)}" y="${yy(v).toFixed(1)}" width="${(bw-2).toFixed(1)}" height="${(H-yy(v)).toFixed(1)}" rx="1.5" fill="var(--accent)"/>` : '').join('');
+  const lab = S.hasT ? 'السعرات اليومية (المنطقة الخضراء = هدفك)' : 'السعرات اليومية';
+  return `<div class="mo-chart"><span>${lab}</span><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${lab}">${band}${bars}</svg></div>`;
+}
+function openMonthSummary(y, m){
+  const now = new Date();
+  if(!(y >= 2000 && m >= 0 && m <= 11)){ y = now.getFullYear(); m = now.getMonth(); }
+  MONTH_REF = {y, m};
+  const S = monthStats(y, m), p = data.profile, hasT = S.hasT, cur = (y*12 + m) >= (now.getFullYear()*12 + now.getMonth());
+  const first = monthEarliest(), canPrev = !!first && (y*12 + m) > (first.y*12 + first.m);
+  const pm = m === 0 ? {y:y-1, m:11} : {y, m:m-1}, nm = m === 11 ? {y:y+1, m:0} : {y, m:m+1};
+  const nav = `<div class="mo-nav"><button type="button" class="ghost" ${canPrev ? '' : 'disabled'} onclick="openMonthSummary(${pm.y},${pm.m})">الشهر السابق</button><b>${AR_MONTHS[m]} ${y}</b><button type="button" class="ghost" ${cur ? 'disabled' : ''} onclick="openMonthSummary(${nm.y},${nm.m})">الشهر التالي</button></div>`;
+  const empty = !S.logged && !S.workouts && S.dW === null && !S.sleepN;
+  if(empty){ trOpenSheet('ملخص الشهر', `${nav}<div class="goal-note">ما في بيانات بهذا الشهر بعد. سجّل أكلك أو وزنك وارجع هنا.</div>`); return; }
+  const tile = (label, val, sub, cls)=>`<div><span>${label}</span><b>${val}</b>${sub ? `<em class="${cls||''}">${sub}</em>` : ''}</div>`;
+  let calSub = '', calCls = '';
+  if(hasT && S.logged){ const tgt = (CAL_MIN+CAL_MAX)/2, dd = Math.round(S.avgCal - tgt);
+    if(Math.abs(dd) <= 100){ calSub = '✅ ضمن هدفك'; calCls = 'ok'; } else if(dd > 0){ calSub = `أعلى بـ ${dd}`; calCls = 'lo'; } else { calSub = `أقل بـ ${-dd}`; calCls = 'lo'; } }
+  let proSub = '', proCls = '';
+  if(hasT && S.logged){ if(S.avgPro >= PRO_MIN){ proSub = '✅ كافي'; proCls = 'ok'; } else { proSub = `الهدف ${Math.round(PRO_MIN)}غ`; proCls = 'lo'; } }
+  const dW = S.dW === null ? '—' : (S.dW>0?'+':S.dW<0?'−':'') + Math.abs(S.dW).toFixed(1) + ' كغم';
+  const grid = [
+    tile('أيام سجلت أكلك', `${S.logged}/${S.n}`, S.logged/S.n >= .7 ? '✅ التزام زين' : '', 'ok'),
+    tile('معدل السعرات', S.logged ? Math.round(S.avgCal) : '—', calSub, calCls),
+    tile('معدل البروتين', S.logged ? Math.round(S.avgPro)+'غ' : '—', proSub, proCls),
+    tile('التمارين', S.workouts ? `${S.workouts} حصة` : '—', '', ''),
+    tile('أيام وصلت هدف الماي', `${S.waterDays}/${S.n}`, '', ''),
+    tile('تغير الوزن', dW, '', ''),
+    tile('معدل النوم', S.sleepN ? `${(+S.avgSleep.toFixed(1))} ساعة` : '—', S.sleepN ? (S.avgSleep>=7 ? '✅ ضمن الموصى' : 'أقل من 7 ساعات') : '', S.avgSleep>=7 ? 'ok' : 'lo'),
+    tile('أطول سلسلة تسجيل', S.bestStreak ? `${S.bestStreak} يوم` : '—', '', '')
+  ].join('');
+  let tip;
+  if(S.logged < S.n * .5) tip = 'سجّل أكلك أغلب أيام الشهر الجاي، حتى تطلع الأرقام أدق ونعرف وين نعدّل.';
+  else if(hasT && S.avgPro < PRO_MIN) tip = 'البروتين أقل من هدفك. ضيف مصدر بروتين لكل وجبة: بيض، دجاج، لحم، سمك، لبن أو جبن.';
+  else if(hasT && S.avgCal > CAL_MAX + 100) tip = 'السعرات أعلى من هدفك. ابدي بالأشياء السهلة: العصائر والحلويات والصوصات.';
+  else if(S.workouts === 0 && data.training && data.training.program) tip = 'ما سجلنا ولا حصة تمرين هذا الشهر. خلي هدفك الشهر الجاي حصتين بالأسبوع على الأقل.';
+  else if(S.sleepN >= 3 && S.avgSleep < 7) tip = 'نومك أقل من 7 ساعات. حاول تنام أبكر بنص ساعة، وبطّل الموبايل قبل النوم.';
+  else if(S.waterDays < S.n * .5) tip = 'اشرب ماي أكثر: خلي قنينة ماي جنبك ودوس «+ كوب» كل ما تشرب.';
+  else tip = 'شهر ممتاز! كمّل بنفس الوتيرة، والاستمرار هو اللي يسوي الفرق 💪';
+  const name = p && p.name ? p.name.split(' ')[0] : '';
+  const hello = name ? `هذا ملخص شهرك يا ${esc(name)} 👇` : 'هذا ملخص شهرك 👇';
+  const sc = monthScore(S);
+  trOpenSheet('ملخص الشهر', `<div class="ws-head"><img src="media/hero-face.webp" alt=""><div class="ob-bubble2">${hello}</div></div>${nav}
+    <div class="ws-score"><div class="ws-ring" style="--p:${sc}"><b>${sc}</b></div><div><strong>${monthScoreMsg(sc)}</strong><span>نقاط شهرك من 100</span></div></div>
+    <div class="ws-grid">${grid}</div>${monthChart(S)}
+    <div class="ws-tip"><b>💡 نصيحتي للشهر الجاي</b>${tip}</div>
+    <div class="ws-share"><button class="primary" onclick="shareOpen('month')">📤 شارك بطاقة شهرك</button></div>
+    <details class="ws-how"><summary>شلون تنحسب النقاط؟</summary>نفس طريقة نقاط الأسبوع، بس على أيام الشهر كلها: تسجيل الأكل 25 · التمارين 25 · الماي 20 · الأكل ضمن هدفك 15 · النوم 7 ساعات أو أكثر 15.</details>`);
+}
+function monthShareData(){
+  const now = new Date(), r = MONTH_REF || {y:now.getFullYear(), m:now.getMonth()}, S = monthStats(r.y, r.m);
+  if(!S.n || (!S.logged && !S.workouts && S.dW === null && !S.sleepN)) return null;
+  return {S, sc:monthScore(S), streak:achStats().streak || 0, n:S.n, month:true, ref:r};
 }
 
 // ================= v102: صور التقدّم (بالجهاز بس: IndexedDB) =================

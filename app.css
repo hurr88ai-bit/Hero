@@ -993,6 +993,13 @@ body{position:relative; isolation:isolate;}
 .ws-head{display:flex; align-items:flex-end; gap:10px; margin-bottom:12px;}
 .ws-head img{width:64px; height:64px; border-radius:50%; object-fit:cover; border:3px solid var(--hero-gold, #c4952f); background:#e9eef8; flex:0 0 auto;}
 .ws-head .ob-bubble2{background:var(--tone-soft); border-radius:16px; padding:10px 12px; font-weight:700; font-size:14px; line-height:1.5;}
+.mo-nav{display:flex; align-items:center; justify-content:space-between; gap:8px; margin:0 0 10px;}
+.mo-nav b{font-size:14px;}
+.mo-nav button{font-size:12px; padding:6px 10px; width:auto;}
+.mo-nav button:disabled{opacity:.35;}
+.mo-chart{margin-top:10px; background:var(--card-2); border:1px solid var(--line); border-radius:14px; padding:10px 12px;}
+.mo-chart span{display:block; font-size:12px; color:var(--muted); margin-bottom:6px;}
+.mo-chart svg{width:100%; height:auto; display:block;}
 .ws-range{font-size:12px; color:var(--muted); margin:-4px 0 10px;}
 .ws-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
 .ws-grid div{background:var(--card-2); border:1px solid var(--line); border-radius:14px; padding:10px 12px;}
