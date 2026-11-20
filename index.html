@@ -279,6 +279,20 @@
       <div id="day-history"><div class="empty">لا يوجد سجل بعد</div></div>
     </div>
 
+    <div class="card" id="remind-card" hidden>
+      <h2>🔔 التذكيرات</h2>
+      <div class="goal-note" style="margin-top:0;">إشعار لطيف بالأوقات اللي تحددها حتى ما تنسى تسجّل أكلك. يوصلك حتى والتطبيق مسكّر.</div>
+      <div class="rm-row"><input type="checkbox" id="push-e-b" onchange="pushRowChange()"><label for="push-e-b">فطور</label><input type="time" id="push-t-b" onchange="pushRowChange()"></div>
+      <div class="rm-row"><input type="checkbox" id="push-e-l" onchange="pushRowChange()"><label for="push-e-l">غداء</label><input type="time" id="push-t-l" onchange="pushRowChange()"></div>
+      <div class="rm-row"><input type="checkbox" id="push-e-d" onchange="pushRowChange()"><label for="push-e-d">عشاء</label><input type="time" id="push-t-d" onchange="pushRowChange()"></div>
+      <div class="btn-row">
+        <button class="primary" id="push-toggle" onclick="pushToggle()">فعّل التذكيرات</button>
+        <button class="ghost" id="push-test" onclick="pushTest()" hidden>جرّب إشعار</button>
+      </div>
+      <div class="goal-note" id="push-note"></div>
+      <div class="goal-note">🔒 لما تفعّلها نرسل لسيرفرنا بس عنوان إشعارات جهازك ومنطقتك الزمنية ولغتك وأوقات التذكير. ما نستلم أكلك ولا وزنك ولا اسمك. إذا طفيتها ينمسح كل شي عنده.</div>
+    </div>
+
     <div class="card" id="backup-card">
       <h2>النسخة الاحتياطية</h2>
       <div class="goal-note" style="margin-top:0;"><b id="cloud-status-2">دا نتأكد من مكان الحفظ...</b><br>بياناتك تنحفظ بحسابك تلقائياً. النسخة الاحتياطية زيادة أمان، نزّلها مرة بالأسبوع.</div>
@@ -331,7 +345,7 @@
 
     <div class="card legal-card">
       <h2>الخصوصية والشروط</h2>
-      <div class="goal-note" style="margin-top:0;">بياناتك (أكلك، وزنك، تمارينك) تنحفظ بموبايلك بس. بس ميزة «صوّر صحنك» ترسل الصورة لسيرفر خارجي حتى يحللها، وما تنحفظ. وما نبيع أو نشارك أي شي.</div>
+      <div class="goal-note" style="margin-top:0;">بياناتك (أكلك، وزنك، تمارينك) تنحفظ بموبايلك بس. الاستثناءان: ميزة «صوّر صحنك» ترسل الصورة لسيرفر خارجي حتى يحللها وما تنحفظ، وميزة «التذكيرات» (إذا فعّلتها) ترسل لسيرفرنا عنوان إشعارات جهازك وأوقات التذكير بس. وما نبيع أو نشارك أي شي.</div>
       <div class="btn-row"><a class="ghost legal-btn" href="privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a><a class="ghost legal-btn" href="terms.html" target="_blank" rel="noopener">الشروط والأحكام</a></div>
     </div>
 

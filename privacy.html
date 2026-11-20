@@ -47,9 +47,9 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 16px 30p
   <section class="sum">
     <h2>الخلاصة</h2>
     <ul>
-      <li>هيرو ما يحتاج حساب، وما عندنا سيرفر يحفظ بياناتك. <b>بياناتك (أكلك، وزنك، تمارينك، معلوماتك) تنحفظ بموبايلك بس،</b> ما عدا صورة الصحن اللي تنرسل بميزة «صوّر صحنك» (شوف الفقرة 3).</li>
+      <li>هيرو ما يحتاج حساب، وما عندنا سيرفر يحفظ أكلك أو وزنك أو بياناتك الصحية. <b>بياناتك (أكلك، وزنك، تمارينك، معلوماتك) تنحفظ بموبايلك بس،</b> ما عدا صورة الصحن اللي تنرسل بميزة «صوّر صحنك»، وإعدادات التذكيرات إذا فعّلتها (شوف الفقرة 3).</li>
       <li>ما نبيع بياناتك، وما نشاركها، وما بيها إعلانات ولا أدوات تتبّع أو تحليل.</li>
-      <li>الشي اللي يطلع من موبايلك داخل التطبيق: <b>رقم الباركود</b> لما تمسح منتج (يروح لـ Open Food Facts)، و<b>صورة الصحن</b> لما تستخدم «صوّر صحنك»: <b>تنرسل لسيرفر خارجي (Cloudflare وبعدها Anthropic) حتى تنحلل</b>، وما تنحفظ.</li>
+      <li>الشي اللي يطلع من موبايلك داخل التطبيق: <b>رقم الباركود</b> لما تمسح منتج (يروح لـ Open Food Facts)، و<b>صورة الصحن</b> لما تستخدم «صوّر صحنك»: <b>تنرسل لسيرفر خارجي (Cloudflare وبعدها Anthropic) حتى تنحلل</b>، وما تنحفظ. وإذا فعّلت <b>«التذكيرات»</b> يرسل التطبيق لسيرفر هيرو <b>عنوان إشعارات جهازك ومنطقتك الزمنية ولغتك وأوقات التذكير</b> بس.</li>
       <li>تكدر تمسح كل شي بأي وقت من: ملفي ← مسح كل البيانات.</li>
     </ul>
   </section>
@@ -66,6 +66,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 16px 30p
       <li>معلومات «ملفي»: الاسم أو اللقب (اختياري)، العمر، الجنس، الطول، الوزن، مستوى النشاط، وهدفك.</li>
       <li>سجل الأكل والماي والنوم، ومنتجاتك ووجباتك وطبخاتك المحفوظة.</li>
       <li>الوزن ومحيط الخصر (إذا سجلته).</li>
+      <li>إعدادات التذكيرات (إذا فعّلتها): الأوقات اللي اخترتها. وإذا فشل مسح اشتراكك من سيرفرنا لما تطفيها، نحتفظ بعنوان الإشعارات مؤقتاً بجهازك حتى نعيد المحاولة، وينمسح أول ما ينجح.</li>
       <li>صور التقدّم (إذا ضفتها): تنحفظ داخل ذاكرة التطبيق بموبايلك بس، ما تنرسل لأي مكان، وما تدخل بملف النسخة الاحتياطية العادي، بس تكدر تنزّل لها ملف نسخة منفصل من بطاقة «صور التقدّم» وتحفظه وين تختار. تكدر تحذفها بأي وقت، وتنمسح إذا مسحت كل البيانات أو التطبيق.</li>
       <li>برنامج التمرين، الجولات والأوزان والعدات، والمناطق اللي اخترت تتجنبها بسبب إصابة.</li>
       <li>الكؤوس والتحديات والإعدادات (اللغة، الملابس بالمدرب…).</li>
@@ -80,6 +81,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 16px 30p
       <li><b>«صوّر صحنك»:</b> هذي الميزة <b>ترسل الصورة لسيرفر خارجي</b> حتى يحللها. بس لما تصوّر صحن أو تختار صورة بنفسك، التطبيق يصغّر الصورة ويرسلها ويا قائمة أسماء الأكلات ولغة التطبيق ورقم عشوائي للجهاز (بدون اسمك ولا وزنك ولا أي بيانات صحية) لسيرفر هيرو على Cloudflare، وهو يرسلها لـ Anthropic (شركة Claude) حتى تتعرف على الأكل وتقدّر الكمية. الصورة <b>ما تنحفظ</b> عندنا، ومثل ما تنص شروط Anthropic التجارية، ما تُستخدم لتدريب نماذجها. حتى نحدد عدد الصور اليومي، ينحفظ بالسيرفر عدّاد يومي مرتبط برقم عشوائي للجهاز وبصمة مشفّرة لعنوان IP، وينمسح تلقائياً بعد يوم تقريباً. سياسة Anthropic: <a href="https://www.anthropic.com/legal/privacy" rel="noopener">anthropic.com/legal/privacy</a>، وCloudflare: <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">cloudflare.com/privacypolicy</a>.</li>
       <li><b>تنزيل التطبيق وتحديثاته:</b> ملفات التطبيق تنزل من استضافة GitHub Pages، وGitHub ممكن يسجل بيانات تقنية مثل عنوان IP ونوع المتصفح بسجلاته لأغراض الأمان والتشغيل. إذا نزلته من Google Play أو App Store، المتجر يتعامل مع التنزيل حسب سياسة الخصوصية مالته.</li>
       <li><b>بطاقات المشاركة (الإنجاز، طريق البطل، ملخص الأسبوع):</b> الصورة تنسوى داخل موبايلك، وما تطلع منه إلا إذا إنت اخترت «شارك» أو «نزّل الصورة». البطاقة بيها اسمك أو لقبك (إذا كاتبه) وأرقام التزامك، وما بيها وزنك ولا سعراتك إلا بطاقة «شارك تقدّمك» اللي بيها تغيّر وزنك ووزنك الحالي. لما تشاركها، توصل للتطبيق أو الشخص اللي تختاره وتخضع لسياسته (مثلاً انستغرام).</li>
+      <li><b>«التذكيرات» (اختيارية):</b> إذا فعّلتها من ملفي، يرسل التطبيق لسيرفر هيرو على Cloudflare <b>عنوان إشعارات جهازك (يصدره متصفحك)، ومنطقتك الزمنية، ولغتك، وأوقات التذكير اللي اخترتها، بس</b>، حتى يرسل لك الإشعار بالوقت المحدد (وCloudflare يشوف عنوان IP مالك مثل أي اتصال بالإنترنت). ما نرسل اسمك ولا أكلك ولا وزنك ولا أي بيانات صحية، والإشعار نفسه ما بيه محتوى. الإشعارات توصلك عن طريق خدمة الإشعارات مال نظامك أو متصفحك (Google أو Apple أو Mozilla أو Microsoft)، وهي تشوف عنوان الجهاز ووقت الإرسال وتخضع لسياساتها. نحتفظ بهذي البيانات لحد ما تطفي التذكيرات (ملفي ← التذكيرات ← طفّي التذكيرات) أو تمسح كل البيانات من التطبيق، وبعد ما ينجح الطلب تنمسح من سيرفرنا. إذا حذفت التطبيق أو مسحت بيانات المتصفح بدون ما تطفيها، ما نكدر نمسحها فوراً، فتنمسح تلقائياً إذا خدمة الإشعارات كالت إن الجهاز ما عاد موجود، أو إذا ما فتحت التطبيق 60 يوم.</li>
       <li><b>«رأيك يهمنا»:</b> هذي الخاصية تنسخ رسالتك (ويا رقم النسخة ونوع الجهاز حتى نفهم المشكلة) وتفتح انستغرام. إنت اللي تقرر تلصقها وتدزها أو لا. الرسالة توصلنا عن طريق Meta وتخضع لسياستها، ونستخدمها بس حتى نرد عليك ونحسّن التطبيق.</li>
     </ul>
   </section>
@@ -90,6 +92,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 16px 30p
       <li><b>الكاميرا:</b> لقراءة الباركود (الصورة تنقرا داخل الجهاز وما تنرسل)، ولـ«صوّر صحنك» (الصورة اللي تختارها تنرسل للتحليل بس، مثل ما بالفقرة 3). ما نفتح الكاميرا إلا لما تضغط الزر.</li>
       <li><b>الكاميرا والصور لـ«صور التقدّم»:</b> الصورة اللي تلتقطها أو تختارها تتصغّر وتنحفظ داخل ذاكرة التطبيق بموبايلك بس، وما تنرسل لأي مكان.</li>
       <li><b>الاهتزاز وإبقاء الشاشة شغالة:</b> لمؤقت الراحة أثناء التمرين، وكلها داخل الجهاز.</li>
+      <li><b>الإشعارات:</b> بس إذا فعّلت التذكيرات، ونطلب الإذن وقتها. تكدر تسحبه بأي وقت من إعدادات المتصفح أو النظام.</li>
       <li>ما نستخدم موقعك (GPS)، ولا جهات الاتصال، ولا المايكروفون، وما نوصل لصورك إلا الصورة اللي تختارها بنفسك.</li>
     </ul>
   </section>
@@ -109,8 +112,8 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 16px 30p
     <ul>
       <li><b>تشوف وتعدّل:</b> كل بياناتك ظاهرة بالتطبيق وتكدر تعدلها.</li>
       <li><b>تنقلها:</b> بملف النسخة الاحتياطية.</li>
-      <li><b>تمسحها:</b> ملفي ← «مسح كل البيانات»، أو احذف التطبيق، أو امسح بيانات الموقع من المتصفح. لأن ما عدنا نسخة، المسح نهائي وما يترجع.</li>
-      <li>تكدر تراسلنا بأي سؤال عن خصوصيتك (القسم 11). لأننا ما نحتفظ ببياناتك، ما عدنا شي نسلمه أو نمسحه من طرفنا، بس راح نساعدك.</li>
+      <li><b>تمسحها:</b> ملفي ← «مسح كل البيانات»، أو احذف التطبيق، أو امسح بيانات الموقع من المتصفح. لأن ما عدنا نسخة من بياناتك، المسح نهائي وما يترجع. (إعدادات التذكيرات اللي على سيرفرنا تنمسح لما تطفي التذكيرات أو تمسح كل البيانات من التطبيق. إذا حذفت التطبيق بدونها تنمسح تلقائياً بعد 60 يوم من آخر فتح.)</li>
+      <li>تكدر تراسلنا بأي سؤال عن خصوصيتك (القسم 11). لأننا ما نحتفظ ببياناتك الصحية، ما عدنا شي نسلمه أو نمسحه من طرفنا غير إعدادات التذكيرات (إذا فعّلتها)، وراح نساعدك بأي طلب.</li>
     </ul>
   </section>
 
@@ -143,9 +146,9 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 16px 30p
   <section class="sum">
     <h2>Summary</h2>
     <ul>
-      <li>HERO needs no account, and we run no server that stores your data. <b>Your data (meals, weight, workouts, profile) is stored only on your device,</b> except the plate photo sent by the "Snap your plate" feature (see section 3).</li>
+      <li>HERO needs no account, and we run no server that stores your meals, weight or health data. <b>Your data (meals, weight, workouts, profile) is stored only on your device,</b> except the plate photo sent by the "Snap your plate" feature and, if you turn them on, your reminder settings (see section 3).</li>
       <li>We don't sell or share your data, and the app has no ads, trackers or analytics.</li>
-      <li>What leaves your device inside the app: a <b>barcode number</b> when you scan a product (sent to Open Food Facts), and a <b>plate photo</b> when you use "Snap your plate": <b>it is sent to an external server (Cloudflare, then Anthropic) to be analysed</b> and never stored.</li>
+      <li>What leaves your device inside the app: a <b>barcode number</b> when you scan a product (sent to Open Food Facts), and a <b>plate photo</b> when you use "Snap your plate": <b>it is sent to an external server (Cloudflare, then Anthropic) to be analysed</b> and never stored. If you turn on <b>Reminders</b>, the app sends HERO’s server <b>only your device’s notification address, time zone, language and reminder times</b>.</li>
       <li>You can erase everything at any time: Profile → Erase all data.</li>
     </ul>
   </section>
@@ -162,6 +165,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 16px 30p
       <li>Profile: name or nickname (optional), age, sex, height, weight, activity level and goal.</li>
       <li>Food, water and sleep log, plus your saved products, meals and dishes.</li>
       <li>Weight and waist measurements (if you log them).</li>
+      <li>Reminder settings (if you turn them on): the times you chose. If deleting your subscription from our server fails when you turn them off, we temporarily keep the notification address on your device to retry, and remove it as soon as the retry succeeds.</li>
       <li>Progress photos (if you add them): stored only in the app’s storage on your phone, never sent anywhere. They are not part of the regular backup file, but you can download a separate photo backup file from the “Progress photos” card and save it wherever you choose. You can delete them at any time, and they are erased if you delete all data or the app.</li>
       <li>Your workout plan, sets, weights and reps, and any body areas you chose to avoid because of an injury.</li>
       <li>Trophies, challenges and settings (language, coach clothing, etc.).</li>
@@ -176,6 +180,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 16px 30p
       <li><b>"Snap your plate":</b> this feature <b>sends the photo to an external server</b> for analysis. Only when you take or choose a photo yourself, the app shrinks it and sends it, together with the list of food names, the app language and a random device number (never your name, weight or any health data), to HERO's server on Cloudflare, which forwards it to Anthropic (the maker of Claude) to identify the food and estimate the amount. We <b>do not store</b> the photo, and under Anthropic's commercial terms it is not used to train their models. To enforce the daily photo limit, the server keeps a daily counter tied to a random device number and a hashed fingerprint of your IP address, deleted automatically after about a day. Anthropic's policy: <a href="https://www.anthropic.com/legal/privacy" rel="noopener">anthropic.com/legal/privacy</a>; Cloudflare: <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">cloudflare.com/privacypolicy</a>.</li>
       <li><b>Downloading the app and updates:</b> the app files are served by GitHub Pages, and GitHub may log technical data such as IP address and browser type for security and operations. If you install from Google Play or the App Store, the store handles the download under its own privacy policy.</li>
       <li><b>Share cards (trophy, Hero's Path, weekly summary):</b> the image is created on your phone and leaves it only if you choose "Share" or "Save image". A card shows your name or nickname (if you entered one) and your consistency numbers; it never shows your weight or calories, except the "Share progress" card, which shows your weight change and current weight. When you share it, it goes to the app or person you choose and is subject to their policy (for example, Instagram).</li>
+      <li><b>"Reminders" (optional):</b> if you turn them on in Profile, the app sends HERO’s server on Cloudflare <b>only your device’s notification address (issued by your browser), your time zone, your language and the reminder times you chose</b>, so it can send you the notification at the right time (Cloudflare can see your IP address, like any internet connection). We never send your name, food, weight or any health data, and the notification itself carries no content. Notifications reach you through your system’s or browser’s push service (Google, Apple, Mozilla or Microsoft), which can see the device address and the time of sending and is covered by its own policy. We keep this data until you turn reminders off (Profile → Reminders → Turn off reminders) or erase all data in the app, and once that request succeeds it is deleted from our server. If you uninstall the app or clear your browser data without turning them off, we cannot delete it immediately, so it is deleted automatically if the push service tells us the device no longer exists, or if you have not opened the app for 60 days.</li>
       <li><b>"Your feedback":</b> this feature copies your message (with the app version and device type, so we can understand the issue) and opens Instagram. You decide whether to paste and send it. It reaches us through Meta under Meta's policy, and we use it only to reply to you and improve the app.</li>
     </ul>
   </section>
@@ -186,6 +191,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 16px 30p
       <li><b>Camera:</b> to read barcodes (processed on the device, never sent) and for "Snap your plate" (the photo you choose is sent only for analysis, as in section 3). The camera opens only when you tap the button.</li>
       <li><b>Camera and photos for "Progress photos":</b> the photo you take or pick is shrunk and stored only in the app's storage on your phone, and is never sent anywhere.</li>
       <li><b>Vibration and keeping the screen on:</b> for the rest timer during workouts, all on the device.</li>
+      <li><b>Notifications:</b> only if you turn on reminders, and we ask for permission at that moment. You can withdraw it any time in your browser or system settings.</li>
       <li>We don't use your location, contacts or microphone, and we never access your photos except the one you pick yourself.</li>
     </ul>
   </section>
@@ -205,8 +211,8 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 16px 30p
     <ul>
       <li><b>Access and correct:</b> all your data is visible in the app and you can edit it.</li>
       <li><b>Portability:</b> via the backup file.</li>
-      <li><b>Deletion:</b> Profile → "Erase all data", uninstall the app, or clear the site's data in your browser. Because we hold no copy, deletion is permanent.</li>
-      <li>You can contact us with any privacy question (section 11). Since we don't hold your data, there is nothing for us to hand over or delete on our side, but we'll gladly help.</li>
+      <li><b>Deletion:</b> Profile → "Erase all data", uninstall the app, or clear the site's data in your browser. Because we hold no copy of your data, deletion is permanent. (Your reminder settings on our server are deleted when you turn reminders off or erase all data in the app. If you uninstall the app without doing so, they are deleted automatically 60 days after you last opened it.)</li>
+      <li>You can contact us with any privacy question (section 11). Since we don't hold your health data, there is nothing for us to hand over or delete on our side other than your reminder settings (if enabled), and we'll gladly help with any request.</li>
     </ul>
   </section>
 

@@ -2890,6 +2890,7 @@ async function resetAll(){
   if(!await askConfirm('مسح كل البيانات المحفوظة؟ هذا الإجراء ما يترجع.\nنصيحة: نزّل نسخة احتياطية قبل المسح.', 'مسح كل شي', true)) return;
   data = {meals:{}, weights:[], customFoods:[], savedMeals:[], recipes:[], water:{}, waist:[], workouts:{}, sleep:{}, onboarded:Date.now()};
   save(); ppClearAll();
+  try{ await pushDisable(true); localStorage.removeItem('hero_push'); }catch(e){}
   mode = null; draft = []; rcItems = []; rcEditId = null;
   document.getElementById('targets-wrap').style.display='none';
   document.getElementById('targets-empty').style.display='block';
@@ -3105,6 +3106,148 @@ function monthShareData(){
   if(!S.n || (!S.logged && !S.workouts && S.dW === null && !S.sleepN)) return null;
   return {S, sc:monthScore(S), streak:achStats().streak || 0, n:S.n, month:true, ref:r};
 }
+
+// ================= v110: تذكيرات الإشعارات (Web Push) =================
+// يرسل لسيرفر hero-push بس: عنوان إشعارات الجهاز + المنطقة الزمنية + اللغة + أوقات التذكير. ما يرسل أكل ولا وزن ولا اسم.
+const PUSH_URL = 'https://hero-push.baghdadhurr.workers.dev';
+const PUSH_KINDS = ['b', 'l', 'd'], PUSH_DEF = {t:{b:'09:00', l:'14:00', d:'21:00'}, e:{b:false, l:true, d:true}};
+function pushLoad(){
+  let s = {}; try{ s = JSON.parse(localStorage.getItem('hero_push') || '{}'); }catch(e){}
+  if(!s || typeof s !== 'object') s = {};
+  const t = {}, e = {};
+  PUSH_KINDS.forEach(k=>{
+    t[k] = s.t && /^([01]\d|2[0-3]):[0-5]\d$/.test(s.t[k]) ? s.t[k] : PUSH_DEF.t[k];
+    e[k] = s.e && typeof s.e[k] === 'boolean' ? s.e[k] : PUSH_DEF.e[k];
+  });
+  return {on:!!s.on, t, e, synced:typeof s.synced === 'string' ? s.synced : ''};
+}
+function pushSave(s){ try{ localStorage.setItem('hero_push', JSON.stringify(s)); }catch(e){} }
+function pushSupported(){ return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window; }
+function pushIosNeedsInstall(){
+  const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const sa = navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+  return ios && !sa;
+}
+function pushLang(){ return window.I18N && I18N.en ? 'en' : 'ar'; }
+function pushB64ToU8(s){ const r = atob((s + '='.repeat((4 - s.length % 4) % 4)).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(r, c=>c.charCodeAt(0)); }
+async function pushApi(path, body){
+  const r = await fetch(PUSH_URL + path, body ? {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)} : {});
+  if(!r.ok){ const e = new Error('push_' + r.status); e.status = r.status; throw e; }
+  return r.json();
+}
+function pushReg(){   // ready تعلّق إذا ماكو service worker، فنحط مهلة
+  return Promise.race([navigator.serviceWorker.ready, new Promise((_, rej)=>setTimeout(()=>rej(new Error('nosw')), 8000))]);
+}
+async function pushRemember(){
+  try{ const c = await caches.open('hero-prefs'); await c.put('prefs', new Response(JSON.stringify({lang:pushLang()}), {headers:{'Content-Type':'application/json'}})); }catch(e){}
+}
+async function pushSub(create){
+  const reg = await pushReg();
+  let sub = await reg.pushManager.getSubscription(), created = false;
+  if(!sub && create){
+    const {key} = await pushApi('/key');
+    sub = await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:pushB64ToU8(key)}); created = true;
+  }
+  return {sub, created};
+}
+function pushReminders(s){
+  const out = [];
+  PUSH_KINDS.forEach(k=>{ if(s.e[k]){ const [h, m] = s.t[k].split(':').map(Number); out.push({h, m}); } });
+  return out;
+}
+async function pushSync(sub){
+  const s = pushLoad();
+  await pushRemember();
+  await pushApi('/subscribe', {endpoint:sub.endpoint, tz:Intl.DateTimeFormat().resolvedOptions().timeZone, lang:pushLang(), reminders:pushReminders(s)});
+  s.synced = todayKey(); pushSave(s);
+}
+async function pushEnable(){
+  if(pushIosNeedsInstall()){ notify('على الآيفون: ضيف هيرو للشاشة الرئيسية أول (مشاركة ← إضافة إلى الشاشة الرئيسية)، وبعدها فعّل التذكيرات.'); return; }
+  if(!pushSupported()){ notify('جهازك أو متصفحك ما يدعم الإشعارات.'); return; }
+  if(!await askConfirm('نرسل لسيرفر هيرو بس: عنوان إشعارات جهازك، ومنطقتك الزمنية، ولغتك، وأوقات التذكير. ما نرسل أكلك ولا وزنك ولا أي بيانات صحية. تكدر تطفيها بأي وقت وينمسح كل شي عنده.', 'فعّل التذكيرات')) return;
+  let perm = Notification.permission;
+  if(perm === 'default') perm = await Notification.requestPermission();
+  if(perm !== 'granted'){ notify('ما انسمح بالإشعارات. فعّلها من إعدادات المتصفح وجرب مرة ثانية.'); pushRender(); return; }
+  let r = null;
+  try{
+    r = await pushSub(true);
+    const s = pushLoad(); s.on = true; pushSave(s);
+    await pushSync(r.sub);
+    notify('انفعلت التذكيرات ✅');
+  }catch(e){
+    const s = pushLoad(); s.on = false; pushSave(s);
+    try{ if(r && r.created && r.sub) await r.sub.unsubscribe(); }catch(x){}
+    notify('ما گدرنا نفعّل التذكيرات هسه. جرب بعدين.');
+  }
+  pushRender();
+}
+function pushPendingDel(){ try{ const a = JSON.parse(localStorage.getItem('hero_push_del') || '[]'); return Array.isArray(a) ? a.filter(x=>typeof x === 'string').slice(0, 20) : []; }catch(e){ return []; } }
+function pushSetPendingDel(a){ try{ if(a.length) localStorage.setItem('hero_push_del', JSON.stringify(a.slice(0, 20))); else localStorage.removeItem('hero_push_del'); }catch(e){} }
+async function pushRetryDelete(){   // إذا فشل طلب المسح من السيرفر، نعيده لما التطبيق يفتح
+  const a = pushPendingDel(); if(!a.length) return;
+  const left = [];
+  for(const ep of a){ try{ await pushApi('/unsubscribe', {endpoint:ep}); }catch(e){ left.push(ep); } }
+  pushSetPendingDel(left);
+}
+async function pushDisable(quiet){
+  const s = pushLoad(); s.on = false; pushSave(s);
+  try{
+    const {sub} = await pushSub(false);
+    if(sub){ try{ await pushApi('/unsubscribe', {endpoint:sub.endpoint}); }catch(e){ pushSetPendingDel(pushPendingDel().concat(sub.endpoint)); } await sub.unsubscribe(); }
+  }catch(e){}
+  if(!quiet) notify('انطفت التذكيرات ✅');
+  pushRender();
+}
+function pushToggle(){ return pushLoad().on ? pushDisable() : pushEnable(); }
+let pushTimer = null;
+function pushRowChange(){
+  const s = pushLoad();
+  PUSH_KINDS.forEach(k=>{
+    const en = document.getElementById('push-e-' + k), tm = document.getElementById('push-t-' + k);
+    if(en) s.e[k] = !!en.checked;
+    if(tm && /^([01]\d|2[0-3]):[0-5]\d$/.test(tm.value)) s.t[k] = tm.value;
+  });
+  pushSave(s);
+  if(!s.on) return;
+  clearTimeout(pushTimer);
+  pushTimer = setTimeout(async ()=>{ try{ const {sub} = await pushSub(false); if(sub) await pushSync(sub); }catch(e){ notify('ما گدرنا نحدّث أوقات التذكير هسه. جرب بعدين.'); } }, 600);
+}
+async function pushTest(){
+  try{
+    const {sub} = await pushSub(false);
+    if(!sub){ notify('ما گدرنا نرسل الإشعار. جرب بعدين.'); return; }
+    const r = await pushApi('/test', {endpoint:sub.endpoint});
+    notify(r.ok ? 'انرسل إشعار تجريبي، لازم يوصلك خلال ثواني.' : 'ما گدرنا نرسل الإشعار. جرب بعدين.');
+  }catch(e){ notify(e && e.status === 429 ? 'انتظر شوية وجرب مرة ثانية.' : 'ما گدرنا نرسل الإشعار. جرب بعدين.'); }
+}
+function pushRender(){
+  const card = document.getElementById('remind-card'); if(!card) return;
+  const ios = pushIosNeedsInstall(), sup = pushSupported();
+  card.hidden = !sup && !ios;
+  if(card.hidden) return;
+  const s = pushLoad(), denied = sup && Notification.permission === 'denied';
+  PUSH_KINDS.forEach(k=>{
+    const en = document.getElementById('push-e-' + k), tm = document.getElementById('push-t-' + k);
+    if(en) en.checked = s.e[k]; if(tm) tm.value = s.t[k];
+  });
+  const b = document.getElementById('push-toggle'), t = document.getElementById('push-test'), n = document.getElementById('push-note');
+  b.textContent = s.on ? 'طفّي التذكيرات' : 'فعّل التذكيرات';
+  b.disabled = !s.on && (ios || denied);
+  t.hidden = !s.on;
+  n.textContent = ios ? 'على الآيفون: ضيف هيرو للشاشة الرئيسية أول (مشاركة ← إضافة إلى الشاشة الرئيسية)، وبعدها فعّل التذكيرات.'
+    : denied && !s.on ? 'الإشعارات ممنوعة بإعدادات المتصفح. فعّلها من هناك وارجع هنا.'
+    : s.on ? 'التذكيرات شغّالة ✅' : 'التذكيرات مطفية.';
+}
+async function pushResync(){   // مرة باليوم: يتأكد الاشتراك لسه موجود ويحدّث المنطقة الزمنية واللغة
+  const s = pushLoad(); if(!s.on || !pushSupported() || s.synced === todayKey()) return;
+  try{
+    if(Notification.permission !== 'granted'){ s.on = false; pushSave(s); pushRender(); return; }
+    const {sub} = await pushSub(false);
+    if(!sub){ s.on = false; pushSave(s); pushRender(); return; }
+    await pushSync(sub);
+  }catch(e){}
+}
+window.addEventListener('load', ()=>{ pushRender(); if(pushLoad().on) pushRemember(); setTimeout(()=>{ pushRetryDelete(); pushResync(); }, 4000); });
 
 // ================= v102: صور التقدّم (بالجهاز بس: IndexedDB) =================
 const PP = {db:null, list:[]};

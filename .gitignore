@@ -1,2 +1,6 @@
 brand/*.ttf
 __pycache__/
+*.jwk.json
+vapid*.json
+.dev.vars
+.wrangler/
