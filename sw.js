@@ -12,34 +12,46 @@ async function sha16(res){   // بصمة محتوى الاستجابة (نفس �
   return [...d.slice(0, 8)].map(x => x.toString(16).padStart(2, '0')).join('');
 }
 const isOld = k => k !== CACHE && k !== DATA_CACHE && (OLD_RE.test(k) || OLD_DATA_RE.test(k));
-// يضمن ملفات البيانات الثقيلة بالكاش الدائم: يرحّل من أي ذاكرة قديمة (نسخة أو بيانات) بس إذا بصمة الملف تطابق (حتى ملف متغيّر ما ينسخ قديم)، وإلا ينزّله بمهلة. فشل ملف ما يوقف الباقي ولا يفشّل التثبيت
-async function ensureData(){
+// 1) ترحيل محلي (بدون شبكة): ينسخ من أي ذاكرة قديمة (نسخة أو بيانات) بس إذا بصمة الملف تطابق (ملف متغيّر ما ينسخ قديم)
+async function migrateData(){
   const dc = await caches.open(DATA_CACHE), ks = (await caches.keys()).filter(isOld);
   for(const f of DATA_FILES){
     const u = new URL(f, self.location).href;
     if(await dc.match(u)) continue;
-    let done = false;
     for(const k of ks){
       try{
         const r = await (await caches.open(k)).match(u);
-        if(r && await sha16(r) === DATA[f]){ await dc.put(u, r); done = true; break; }
+        if(r && await sha16(r) === DATA[f]){ await dc.put(u, r); break; }
       }catch(err){}
     }
-    if(done) continue;
+  }
+}
+// 2) تنزيل الناقص بمهلة لكل ملف. فشل ملف ما يوقف الباقي ولا يفشّل التثبيت
+async function downloadData(){
+  const dc = await caches.open(DATA_CACHE);
+  for(const f of DATA_FILES){
+    const u = new URL(f, self.location).href;
+    if(await dc.match(u)) continue;
     const ac = typeof AbortController === 'function' ? new AbortController() : null, tm = ac ? setTimeout(() => ac.abort(), 30000) : 0;
     try{ const n = await fetch(u, ac ? {signal: ac.signal} : undefined); if(n.ok) await dc.put(u, n); }catch(err){ /* انقطع النت أو تأخر: نكمل بالمحاولة الجاية (رسالة الصفحة أو الاستعمال) */ }
     finally{ if(tm) clearTimeout(tm); }
   }
 }
-let dataBusy = null;
-function ensureDataOnce(){ return dataBusy || (dataBusy = ensureData().catch(() => {}).finally(() => { dataBusy = null; })); }
+async function ensureData(){ await migrateData(); await downloadData(); }
+let dataBusy = null, dataAgain = false;
+// تشغيل واحد بنفس الوقت؛ وإذا وصل طلب ثاني أثناء الشغل نعيد دورة وحدة بعد ما ينتهي (حتى ما تضيع محاولة بعد زوال انقطاع/تعليق)
+function ensureDataOnce(){
+  if(dataBusy){ dataAgain = true; return dataBusy; }
+  dataBusy = (async () => { do{ dataAgain = false; try{ await ensureData(); }catch(err){} }while(dataAgain); })().finally(() => { dataBusy = null; });
+  return dataBusy;
+}
 self.addEventListener('install', e => {
   e.waitUntil((async () => { await (await caches.open(CACHE)).addAll(CORE); await Promise.race([ensureDataOnce(), timeout(90000)]); })());   // سقف 90 ثانية: تنزيل معلّق ما يوقف التثبيت
   self.skipWaiting();
 });
 self.addEventListener('activate', e => {
   e.waitUntil((async () => {
-    await Promise.race([ensureDataOnce(), timeout(30000)]);   // يرحّل أي ملف بيانات ناقص من القديم قبل ما نمسحه
+    await Promise.race([migrateData().catch(() => {}), timeout(60000)]);   // ترحيل محلي (أجزاء من الثانية عادةً، بدون شبكة)؛ سقف 60 ثانية مبالغ فيه عمداً حتى ما يعلّق التفعيل لو صار خلل، وإذا انتهى نحتفظ بالكاش القديم بحذر
     const ks = await caches.keys(), dc = await caches.open(DATA_CACHE), missing = [];
     for(const f of DATA_FILES){ const u = new URL(f, self.location).href; if(!(await dc.match(u))) missing.push(u); }
     const del = [];
