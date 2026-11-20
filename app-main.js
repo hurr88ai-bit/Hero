@@ -4163,7 +4163,7 @@ function trSetLink(v){
 
 // ---------- ورقة التمرين (بوتوم شيت) ----------
 /* ============ v75: رأيك يهمنا (يوصل برسالة انستغرام) ============ */
-const HERO_VER = '109', FB_IG = 'heroapp.iq';
+const HERO_VER = '110', FB_IG = 'heroapp.iq';
 function fbOpen(type){
   let draft = ''; try{ draft = localStorage.getItem('hero_fb') || ''; }catch(e){}
   const t = type || 'idea';
