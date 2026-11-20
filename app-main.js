@@ -873,11 +873,22 @@ const CTX = {
   db: {input:'db-food', results:'db-results', amount:'db-amount', unit:'db-unit', preview:'db-preview', hits:[], hl:0, food:null, idle:'اختر أكلة من نتائج البحث، وبعدين الكمية والوحدة.'},
   rc: {input:'rc-food', results:'rc-results', amount:'rc-amount', unit:'rc-unit', preview:'rc-preview', hits:[], hl:0, food:null, idle:''}
 };
-let SEARCH_INDEX = [];
+let SEARCH_INDEX = [], SEARCH_READY = false;
+// فهرس البحث ينبني وقت الخمول بعد ما تنعرض الشاشة (مو عند الفتح)؛ وأي كود يحتاجه قبل ذلك ينبّيه فوراً
+function ensureFoodIndex(){ if(!SEARCH_READY) populateFoodList(); }
+function scheduleFoodIndex(){
+  if('requestIdleCallback' in window) requestIdleCallback(ensureFoodIndex, {timeout:1500}); else setTimeout(ensureFoodIndex, 300);
+}
 function recipeBase(r){ return num(r.base) || num(r.cooked) || (r.items||[]).reduce((a,it)=>a+itemGrams(it),0); }
 function recipeFood(r){ return {cal:r.per.cal, pro:r.per.pro, carb:r.per.carb, fat:r.per.fat, src:'R', recipeId:r.id,
   base:recipeBase(r), servings:num(r.servings), cookedKnown:num(r.cooked)>0}; }
 function recipeName(r){ return 'طبختي: ' + r.name; }
+let SYN_NORM = null;   // مفاتيح المرادفات ومرادفاتها بعد التطبيع: نحسبها مرة وحدة (كانت تنحسب لكل أكلة، ~45 ألف استدعاء عند الفتح)
+function synNorm(){
+  if(!SYN_NORM) SYN_NORM = Object.keys(SYNONYMS).map(w=>[normAr(w), SYNONYMS[w].map(normAr)]);
+  return SYN_NORM;
+}
+const SYN_PREFIXES = ['', 'ال', 'بال', 'ب', 'و', 'ول'];
 function populateFoodList(){
   const all = Object.keys(FOOD_DB).map(n=>({name:n, f:FOOD_DB[n], kind:'db'}))
     .concat((data.customFoods||[]).map(f=>({name:f.name, f, kind:'custom'})))
@@ -885,18 +896,20 @@ function populateFoodList(){
   SEARCH_INDEX = all.map(x=>{
     const base = normAr(x.name);
     let extra = [];
-    const words = base.split(' '), hasW = k => k.includes(' ') ? base.includes(k) : words.some(x=>['','ال','بال','ب','و','ول'].some(pf=>x.startsWith(pf + k)));   // الكلمة لازم تبدي بيها (حتى «رز» ما يطلع بـ«كرزية»)
-    Object.keys(SYNONYMS).forEach(w=>{ if(hasW(normAr(w))) extra = extra.concat(SYNONYMS[w].map(normAr)); });
+    const words = base.split(' '), hasW = k => k.includes(' ') ? base.includes(k) : words.some(x=>SYN_PREFIXES.some(pf=>x.startsWith(pf + k)));   // الكلمة لازم تبدي بيها (حتى «رز» ما يطلع بـ«كرزية»)
+    synNorm().forEach(([k, v])=>{ if(hasW(k)) extra = extra.concat(v); });
     const en = (window.I18N && I18N.en) ? (I18N.food(x.name) || (x.kind === 'recipe' ? I18N.t(x.name) : '')) : '';
     const ek = en && en !== x.name ? normAr(en) : '';
     return {...x, key: base, ek, hay: base + ' ' + extra.join(' ') + (ek ? ' ' + ek : '')};
   });
+  SEARCH_READY = true;
 }
 const VEG_START = 'خس', VEG_END = 'خيار مخلل';   // كل الأسماء بين هذني بقاعدة الأكل = خضار
 const VEG_NAMES = (()=>{ const k = Object.keys(FOOD_DB), a = k.indexOf(VEG_START), b = k.indexOf(VEG_END); return a >= 0 && b > a ? k.slice(a, b + 1) : []; })()
   .concat(['باذنجان نيء','بامية نيئة','كوسا نيئة','بزاليا نيئة','بطاطا نيئة','بطاطا مسلوقة','ذرة مسلوقة'].filter(n=>FOOD_DB[n]));
 const FRUIT_NAMES = (()=>{ const k = Object.keys(FOOD_DB), a = k.indexOf('موزة'), b = k.indexOf('مشمش مجفف (قمر الدين/مقدد)'); return a >= 0 && b > a ? k.slice(a, b + 1) : []; })();
 function searchFoods(q){
+  ensureFoodIndex();
   const nq = normAr(q);
   if(!nq) return [];
   if(['خضار','خضروات','خضره','خضرة','خضراوات','vegetables','vegetable','veggies','veg'].map(normAr).includes(nq)) return VEG_NAMES.map(n=>SEARCH_INDEX.find(x=>x.name===n)).filter(Boolean);   // كلمة "خضار" تطلع كل الخضار
@@ -926,12 +939,15 @@ function findFood(name){
   const rec = (data.recipes||[]).find(r=>recipeName(r)===name);
   if(rec) return recipeFood(rec);
   const n = normAr(name);
+  ensureFoodIndex();
   const hit = SEARCH_INDEX.find(x=>x.key===n) || SEARCH_INDEX.find(x=>x.ek && x.ek===n);
   return hit ? hit.f : null;
 }
 function exactName(name){
   name = String(name||'').trim();
+  if(!name) return name;   // اسم فاضي: ما نحتاج الفهرس (يصير عند الفتح)
   if(FOOD_DB[name] || (data.customFoods||[]).some(f=>f.name===name) || (data.recipes||[]).some(r=>recipeName(r)===name)) return name;
+  ensureFoodIndex();
   const nn = normAr(name), hit = SEARCH_INDEX.find(x=>x.key===nn) || SEARCH_INDEX.find(x=>x.ek && x.ek===nn);
   return hit ? hit.name : name;
 }
@@ -2257,7 +2273,7 @@ const SNAP = (()=>{
 
   // كل الأسماء اللي نگدر نحسب سعراتها بالغرام: قاعدة الأكل + منتجاتي + طبخاتي المعروف وزنها
   function catalog(){
-    if(!SEARCH_INDEX.length) populateFoodList();
+    ensureFoodIndex();
     return SEARCH_INDEX.filter(x=>x.kind !== 'recipe' || x.f.cookedKnown).map(x=>x.name);
   }
 
@@ -4746,7 +4762,7 @@ wdSync();
 document.getElementById('in-waist-date').value = todayKey();
 document.getElementById('in-waist-date').max = todayKey();
 load();
-populateFoodList();
+scheduleFoodIndex();
 applyTargets();
 setDay(todayKey());
 syncUnits('db'); syncUnits('rc');
