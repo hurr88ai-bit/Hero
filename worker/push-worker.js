@@ -8,7 +8,7 @@ const ALLOWED_ORIGINS = [
 ];
 // السيرفر يرسل لعناوين خدمات الإشعارات المعروفة بس (حتى ما يتحول لأداة طلبات لأي رابط)
 const PUSH_HOSTS = [/^fcm\.googleapis\.com$/, /^updates\.push\.services\.mozilla\.com$/, /^web\.push\.apple\.com$/, /^[a-z0-9-]+\.notify\.windows\.com$/];
-const MAX_BODY = 4096, MAX_ENDPOINT = 1000, MAX_REMINDERS = 5, MAX_ROWS = 20000;
+const MAX_BODY = 4096, MAX_ENDPOINT = 1000, MAX_REMINDERS = 8, MAX_ROWS = 20000;
 const SUBS_PER_IP_HOUR = 100;       // حد تسجيل لكل IP بالساعة (IP مشترك بالشبكات الموبايلية، فالحد واسع)
 const STALE_DAYS = 60;              // الاشتراك اللي ما تجدّد (التطبيق يجدّده كل يوم يفتحه) ينمسح بعد 60 يوم
 const PAGE = 500;

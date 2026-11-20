@@ -282,14 +282,14 @@
     <div class="card" id="remind-card" hidden>
       <h2>🔔 التذكيرات</h2>
       <div class="goal-note" style="margin-top:0;">إشعار لطيف بالأوقات اللي تحددها حتى ما تنسى تسجّل أكلك. يوصلك حتى والتطبيق مسكّر.</div>
-      <div class="rm-row"><input type="checkbox" id="push-e-b" onchange="pushRowChange()"><label for="push-e-b">فطور</label><input type="time" id="push-t-b" onchange="pushRowChange()"></div>
-      <div class="rm-row"><input type="checkbox" id="push-e-l" onchange="pushRowChange()"><label for="push-e-l">غداء</label><input type="time" id="push-t-l" onchange="pushRowChange()"></div>
-      <div class="rm-row"><input type="checkbox" id="push-e-d" onchange="pushRowChange()"><label for="push-e-d">عشاء</label><input type="time" id="push-t-d" onchange="pushRowChange()"></div>
+      <div id="push-rows"></div>
+      <div class="btn-row"><button type="button" class="ghost" id="push-add" onclick="pushAddRow()">＋ ضيف وجبة</button></div>
       <div class="btn-row">
         <button class="primary" id="push-toggle" onclick="pushToggle()">فعّل التذكيرات</button>
         <button class="ghost" id="push-test" onclick="pushTest()" hidden>جرّب إشعار</button>
       </div>
       <div class="goal-note" id="push-note"></div>
+      <div class="goal-note">قد يوصل التذكير خلال 5 دقايق من الوقت اللي تحدده. أسماء الوجبات تبقى بجهازك ولا تنرسل لأي مكان.</div>
       <div class="goal-note">🔒 لما تفعّلها نرسل لسيرفرنا بس عنوان إشعارات جهازك ومنطقتك الزمنية ولغتك وأوقات التذكير. ما نستلم أكلك ولا وزنك ولا اسمك. إذا طفيتها ينمسح كل شي عنده.</div>
     </div>
 

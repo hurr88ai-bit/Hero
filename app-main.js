@@ -3110,16 +3110,30 @@ function monthShareData(){
 // ================= v110: تذكيرات الإشعارات (Web Push) =================
 // يرسل لسيرفر hero-push بس: عنوان إشعارات الجهاز + المنطقة الزمنية + اللغة + أوقات التذكير. ما يرسل أكل ولا وزن ولا اسم.
 const PUSH_URL = 'https://hero-push.baghdadhurr.workers.dev';
-const PUSH_KINDS = ['b', 'l', 'd'], PUSH_DEF = {t:{b:'09:00', l:'14:00', d:'21:00'}, e:{b:false, l:true, d:true}};
+const PUSH_MAX = 8, PUSH_TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+function pushCleanName(n){ return String(n == null ? '' : n).replace(/[\u0000-\u001f\u007f<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 24); }
+function pushDefaultList(){
+  const en = pushLang() === 'en';
+  return [{n:en ? 'Breakfast' : 'فطور', t:'09:00', e:false}, {n:en ? 'Lunch' : 'غداء', t:'14:00', e:true}, {n:en ? 'Dinner' : 'عشاء', t:'21:00', e:true}];
+}
+function pushCleanList(a){
+  if(!Array.isArray(a)) return null;
+  const out = [];
+  a.slice(0, PUSH_MAX).forEach((x, i)=>{
+    if(!x || typeof x !== 'object') return;
+    out.push({n:pushCleanName(x.n) || ((pushLang() === 'en' ? 'Meal ' : 'وجبة ') + (i + 1)), t:PUSH_TIME_RE.test(x.t) ? x.t : '12:00', e:x.e !== false});
+  });
+  return out;
+}
 function pushLoad(){
   let s = {}; try{ s = JSON.parse(localStorage.getItem('hero_push') || '{}'); }catch(e){}
   if(!s || typeof s !== 'object') s = {};
-  const t = {}, e = {};
-  PUSH_KINDS.forEach(k=>{
-    t[k] = s.t && /^([01]\d|2[0-3]):[0-5]\d$/.test(s.t[k]) ? s.t[k] : PUSH_DEF.t[k];
-    e[k] = s.e && typeof s.e[k] === 'boolean' ? s.e[k] : PUSH_DEF.e[k];
-  });
-  return {on:!!s.on, t, e, synced:typeof s.synced === 'string' ? s.synced : ''};
+  let list = pushCleanList(s.list);
+  if(!list && s.t && typeof s.t === 'object'){   // انتقال من الشكل القديم (فطور/غداء/عشاء ثابتة)
+    const d = pushDefaultList();
+    list = pushCleanList(['b', 'l', 'd'].map((k, i)=>({n:d[i].n, t:s.t[k], e:s.e && typeof s.e[k] === 'boolean' ? s.e[k] : d[i].e})));
+  }
+  return {on:!!s.on, list:list || pushDefaultList(), synced:typeof s.synced === 'string' ? s.synced : ''};
 }
 function pushSave(s){ try{ localStorage.setItem('hero_push', JSON.stringify(s)); }catch(e){} }
 function pushSupported(){ return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window; }
@@ -3139,7 +3153,13 @@ function pushReg(){   // ready تعلّق إذا ماكو service worker، فن�
   return Promise.race([navigator.serviceWorker.ready, new Promise((_, rej)=>setTimeout(()=>rej(new Error('nosw')), 8000))]);
 }
 async function pushRemember(){
-  try{ const c = await caches.open('hero-prefs'); await c.put('prefs', new Response(JSON.stringify({lang:pushLang()}), {headers:{'Content-Type':'application/json'}})); }catch(e){}
+  try{
+    const st = pushLoad();
+    if(!st.on){ await caches.delete('hero-prefs'); return; }   // التذكيرات مطفية: ما نخلّي أسماء الوجبات بالكاش
+    const items = st.list.filter(x=>x.e).map(x=>({n:x.n, m:+x.t.slice(0, 2) * 60 + +x.t.slice(3)}));   // الأسماء تبقى بالجهاز بس (الـservice worker يقراها)
+    const c = await caches.open('hero-prefs');
+    await c.put('prefs', new Response(JSON.stringify({lang:pushLang(), items}), {headers:{'Content-Type':'application/json'}}));
+  }catch(e){}
 }
 async function pushSub(create){
   const reg = await pushReg();
@@ -3151,9 +3171,7 @@ async function pushSub(create){
   return {sub, created};
 }
 function pushReminders(s){
-  const out = [];
-  PUSH_KINDS.forEach(k=>{ if(s.e[k]){ const [h, m] = s.t[k].split(':').map(Number); out.push({h, m}); } });
-  return out;
+  return s.list.filter(x=>x.e).slice(0, PUSH_MAX).map(x=>({h:+x.t.slice(0, 2), m:+x.t.slice(3)}));   // السيرفر يستلم الأوقات بس، مو الأسماء
 }
 async function pushSync(sub){
   const s = pushLoad();
@@ -3191,6 +3209,7 @@ async function pushRetryDelete(){   // إذا فشل طلب المسح من ال
 }
 async function pushDisable(quiet){
   const s = pushLoad(); s.on = false; pushSave(s);
+  try{ await caches.delete('hero-prefs'); }catch(e){}
   try{
     const {sub} = await pushSub(false);
     if(sub){ try{ await pushApi('/unsubscribe', {endpoint:sub.endpoint}); }catch(e){ pushSetPendingDel(pushPendingDel().concat(sub.endpoint)); } await sub.unsubscribe(); }
@@ -3200,17 +3219,28 @@ async function pushDisable(quiet){
 }
 function pushToggle(){ return pushLoad().on ? pushDisable() : pushEnable(); }
 let pushTimer = null;
-function pushRowChange(){
-  const s = pushLoad();
-  PUSH_KINDS.forEach(k=>{
-    const en = document.getElementById('push-e-' + k), tm = document.getElementById('push-t-' + k);
-    if(en) s.e[k] = !!en.checked;
-    if(tm && /^([01]\d|2[0-3]):[0-5]\d$/.test(tm.value)) s.t[k] = tm.value;
-  });
-  pushSave(s);
+function pushCollect(){   // يقرا الصفوف من الشاشة
+  const rows = document.querySelectorAll('#push-rows .rm-row');
+  if(!rows.length) return pushLoad().list;
+  return pushCleanList([...rows].map(r=>({n:r.querySelector('.rm-name').value, t:r.querySelector('.rm-time').value, e:r.querySelector('.rm-on').checked}))) || [];
+}
+function pushStore(list){ const s = pushLoad(); s.list = list; pushSave(s); return s; }
+function pushAfterEdit(s){
+  pushRemember();
   if(!s.on) return;
   clearTimeout(pushTimer);
   pushTimer = setTimeout(async ()=>{ try{ const {sub} = await pushSub(false); if(sub) await pushSync(sub); }catch(e){ notify('ما گدرنا نحدّث أوقات التذكير هسه. جرب بعدين.'); } }, 600);
+}
+function pushRowChange(){ pushAfterEdit(pushStore(pushCollect())); }
+function pushAddRow(){
+  const list = pushCollect();
+  if(list.length >= PUSH_MAX){ notify('أقصى عدد 8 وجبات.'); return; }
+  list.push({n:(pushLang() === 'en' ? 'Meal ' : 'وجبة ') + (list.length + 1), t:'17:00', e:true});
+  const s = pushStore(list); pushRender(); pushAfterEdit(s);
+}
+function pushDelRow(i){
+  const list = pushCollect(); list.splice(i, 1);
+  const s = pushStore(list); pushRender(); pushAfterEdit(s);
 }
 async function pushTest(){
   try{
@@ -3226,10 +3256,9 @@ function pushRender(){
   card.hidden = !sup && !ios;
   if(card.hidden) return;
   const s = pushLoad(), denied = sup && Notification.permission === 'denied';
-  PUSH_KINDS.forEach(k=>{
-    const en = document.getElementById('push-e-' + k), tm = document.getElementById('push-t-' + k);
-    if(en) en.checked = s.e[k]; if(tm) tm.value = s.t[k];
-  });
+  const box = document.getElementById('push-rows');
+  if(box) box.innerHTML = s.list.map((x, i)=>`<div class="rm-row"><input type="checkbox" class="rm-on" ${x.e ? 'checked' : ''} onchange="pushRowChange()" aria-label="تفعيل"><input type="text" class="rm-name" maxlength="24" value="${esc(x.n)}" placeholder="اسم الوجبة" onchange="pushRowChange()"><input type="time" class="rm-time" value="${x.t}" onchange="pushRowChange()"><button type="button" class="rm-del" onclick="pushDelRow(${i})" aria-label="احذف">×</button></div>`).join('');
+  const add = document.getElementById('push-add'); if(add) add.disabled = s.list.length >= PUSH_MAX;
   const b = document.getElementById('push-toggle'), t = document.getElementById('push-test'), n = document.getElementById('push-note');
   b.textContent = s.on ? 'طفّي التذكيرات' : 'فعّل التذكيرات';
   b.disabled = !s.on && (ios || denied);

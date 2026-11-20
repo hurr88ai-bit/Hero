@@ -45,9 +45,19 @@ const REMIND = {
 async function heroPrefs(){ try{ const r = await (await caches.open('hero-prefs')).match('prefs'); return r ? await r.json() : {}; }catch(e){ return {}; } }
 self.addEventListener('push', e => {
   e.waitUntil((async () => {
-    const p = await heroPrefs(), L = REMIND[p.lang === 'en' ? 'en' : 'ar'], h = new Date().getHours();
-    const m = h < 11 ? L.morning : h < 17 ? L.noon : L.evening;
-    await self.registration.showNotification(m[0], {body: m[1], icon: 'icons/icon-192.png', badge: 'icons/icon-32.png', tag: 'hero-reminder', renotify: true, data: {url: './'}});   // نفس الوسم يستبدل القديم، وrenotify يخلي البديل يطلع بلافتة وصوت مو بصمت
+    const p = await heroPrefs(), lang = p.lang === 'en' ? 'en' : 'ar', L = REMIND[lang], d = new Date(), now = d.getHours() * 60 + d.getMinutes();
+    // نختار اسم الوجبة اللي وقتها أقرب وقت مضى (لحد 20 دقيقة)؛ الأسماء من الجهاز، السيرفر ما يعرفها
+    let hit = null;
+    for(const it of (Array.isArray(p.items) ? p.items : [])){
+      const m = Number(it && it.m), n = String(it && it.n || '').replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, 24);
+      if(!isFinite(m) || !n) continue;
+      const diff = ((now - m + 1440 + 720) % 1440) - 720;   // فرق موقّع بالدقايق (يغطي عبور منتصف الليل)
+      if(diff >= -5 && diff <= 20 && (!hit || Math.abs(diff) < Math.abs(hit.diff))) hit = {diff, n};   // -5: السيرفر يقرّب آخر دقايق اليوم لـ23:55
+    }
+    const h = d.getHours();
+    const m = hit ? (lang === 'en' ? ['Time for ' + hit.n + ' 🍽️', 'Log it in HERO, it takes a minute.'] : ['وقت ' + hit.n + ' 🍽️', 'سجّلها بهيرو، تاخذ دقيقة.'])
+      : h < 11 ? L.morning : h < 17 ? L.noon : L.evening;
+    await self.registration.showNotification(m[0], {body: m[1], icon: 'icons/icon-192.png', badge: 'icons/icon-32.png', tag: 'hero-reminder', renotify: true, data: {url: './'}});
   })());
 });
 self.addEventListener('notificationclick', e => {
