@@ -18,6 +18,9 @@ import hashlib, json, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IDX, SW = os.path.join(ROOT, 'index.html'), os.path.join(ROOT, 'sw.js')
+APP_JS = os.path.join(ROOT, 'app-main.js')   # HERO_VER صار داخل app-main.js مو index.html
+VQ_RE = re.compile(r'((?:app\.css|app-i18n\.js|app-main\.js|app-extra\.js)\?v=)\d+')
+def path_of(f): return f.split('?')[0]
 VER_RE = re.compile(r"(const HERO_VER = ')(\d+)(')")
 ABOUT_RE = re.compile(r'(<div class="about-sub" style="opacity:\.6">نسخة تجريبية )(\d+)(</div>)')
 
@@ -33,7 +36,8 @@ def main():
     if not check and len(nums) != 1:
         die('اكتب رقم النسخة، مثلاً: python3 tools/release.py 85  (أو --check للفحص بس)')
     s = open(IDX, encoding='utf-8').read()
-    m1, m2 = VER_RE.search(s), ABOUT_RE.search(s)
+    js = open(APP_JS, encoding='utf-8').read()
+    m1, m2 = VER_RE.search(js), ABOUT_RE.search(s)
     if not m1 or not m2:
         die('ما لكيت علامات رقم النسخة بـindex.html (HERO_VER أو «نسخة تجريبية»). تغيّر شكلها؟ صلّح التعبير بهذا السكربت.')
     cur = m1.group(2)
@@ -42,7 +46,7 @@ def main():
 
     sw = open(SW, encoding='utf-8').read()
     core = json.loads(re.search(r'const CORE = (\[.*?\]);', sw).group(1))
-    missing = [f for f in core[1:] if not os.path.exists(os.path.join(ROOT, f))]
+    missing = [f for f in core[1:] if not os.path.exists(os.path.join(ROOT, path_of(f)))]
     if missing:
         die('ملفات بقائمة الـservice worker مو موجودة: ' + ', '.join(missing))
 
@@ -59,13 +63,17 @@ def main():
     new = nums[0]
     if int(new) <= int(cur):
         die(f'النسخة الجديدة ({new}) لازم تكون أكبر من الحالية ({cur})')
-    s = VER_RE.sub(lambda m: m.group(1) + new + m.group(3), s, count=1)
+    js = VER_RE.sub(lambda m: m.group(1) + new + m.group(3), js, count=1)
     s = ABOUT_RE.sub(lambda m: m.group(1) + new + m.group(3), s, count=1)
+    s = VQ_RE.sub(lambda m: m.group(1) + new, s)   # ?v= بالصفحة
+    open(APP_JS, 'w', encoding='utf-8').write(js)
     open(IDX, 'w', encoding='utf-8').write(s)
+    sw = VQ_RE.sub(lambda m: m.group(1) + new, sw)   # ?v= بقائمة الـservice worker
+    core = json.loads(re.search(r'const CORE = (\[.*?\]);', sw).group(1))
 
     h = hashlib.sha1()
     for f in core[1:]:
-        h.update(open(os.path.join(ROOT, f), 'rb').read())
+        h.update(open(os.path.join(ROOT, path_of(f)), 'rb').read())
     cache = f'hero-{new}-{h.hexdigest()[:8]}'
     sw = re.sub(r"const CACHE = '[^']+';", f"const CACHE = '{cache}';", sw, count=1)
     open(SW, 'w', encoding='utf-8').write(sw)

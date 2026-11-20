@@ -13,11 +13,11 @@ yy, xx = np.mgrid[0:S, 0:S]
 t = np.clip(np.hypot(xx - 256 * k, yy - 140 * k) / (440 * k), 0, 1)[..., None]
 A, B = np.array([42, 68, 120.]), np.array([19, 35, 63.])
 HERE = os.path.dirname(os.path.abspath(__file__))
-def font(fam):   # الخط ينسحب من index.html (مضمّن بيه woff2) ويتحول ttf مرة وحدة
+def font(fam):   # الخط ينسحب من app.css (مضمّن بيه woff2) ويتحول ttf مرة وحدة
     p = os.path.join(HERE, fam + '.ttf')
     if not os.path.exists(p):
         from fontTools.ttLib import TTFont
-        s = open(os.path.join(HERE, '..', 'index.html'), encoding='utf-8').read()
+        s = open(os.path.join(HERE, '..', 'app.css'), encoding='utf-8').read()
         b = re.search(r"@font-face\{font-family:'%s';[^}]*?base64,([A-Za-z0-9+/=]+)" % fam, s).group(1)
         t = TTFont(io.BytesIO(base64.b64decode(b))); t.flavor = None; t.save(p)
     return p
