@@ -2982,6 +2982,62 @@ function ppCmpShow(aId, bId){
 }
 async function ppClearAll(){ try{ await ppTx('readwrite', st=>st.clear()); }catch(e){} PP.list = []; }
 
+// ---- v107: نسخة احتياطية لصور التقدّم (ملف منفصل، تنحفظ وين يختار المستخدم) ----
+const PP_IMG_RE = /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+\/]+={0,2}$/;
+const PP_ID_RE = /^[A-Za-z0-9_-]{1,40}$/;
+const PP_MAX_PHOTOS = 1000, PP_MAX_IMG = 4000000, PP_MAX_FILE = 400*1024*1024;
+async function ppExport(){
+  await ppLoad();
+  if(!PP.list.length){ notify('ما عندك صور تنزّلها'); return; }
+  try{
+    if(PP.list.length > PP_MAX_PHOTOS){ notify('صورك أكثر من اللازم لملف واحد. احذف بعض الصور القديمة وجرب مرة ثانية.'); return; }
+    const text = JSON.stringify({app:'hero-photos', version:1, exported:new Date().toISOString(), photos:PP.list.map(p=>({id:p.id, date:p.date, t:p.t, img:p.img}))});
+    if(text.length > PP_MAX_FILE){ notify('صورك أكثر من اللازم لملف واحد. احذف بعض الصور القديمة وجرب مرة ثانية.'); return; }
+    const url = URL.createObjectURL(new Blob([text], {type:'application/json'}));
+    const a = document.createElement('a'); a.href = url; a.download = `hero-photos-${todayKey()}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 5000);
+    notify('نزلت نسخة الصور ✅');
+  }catch(e){ notify('ما گدرنا ننزّل ملف الصور'); }
+}
+function ppCleanImport(obj){
+  if(!obj || typeof obj!=='object' || obj.app!=='hero-photos' || !Array.isArray(obj.photos)) throw new Error('bad');
+  const seen = new Set(), out = [];
+  for(const p of obj.photos){
+    if(out.length >= PP_MAX_PHOTOS) break;
+    if(!p || typeof p!=='object') continue;
+    const id = p.id, date = p.date, t = Number(p.t), img = p.img;
+    if(typeof id!=='string' || !PP_ID_RE.test(id) || seen.has(id)) continue;
+    if(typeof date!=='string' || !DATE_RE.test(date) || !isFinite(t) || t<0) continue;
+    if(typeof img!=='string' || img.length>PP_MAX_IMG || !PP_IMG_RE.test(img)) continue;
+    seen.add(id); out.push({id, date, t, img});
+  }
+  return out;
+}
+function ppImport(input){
+  const file = input.files && input.files[0];
+  input.value = '';
+  if(!file) return;
+  if(file.size > PP_MAX_FILE){ notify('هذا الملف مو نسخة صور صالحة'); return; }
+  const reader = new FileReader();
+  reader.onload = async ()=>{
+    let clean;
+    try{ clean = ppCleanImport(JSON.parse(reader.result)); }
+    catch(e){ notify('هذا الملف مو نسخة صور صالحة'); return; }
+    await ppLoad();
+    const have = new Set(PP.list.map(p=>p.id));
+    const fresh = clean.filter(p=>!have.has(p.id));
+    if(!fresh.length){ notify('ما لكينا صور جديدة بالملف'); return; }
+    if(!await askConfirm(`الملف فيه ${fresh.length} صورة جديدة. تضيفهن لصورك؟ (صورك الحالية ما تنمسح)`, 'ضيفهن')) return;
+    try{ await ppTx('readwrite', st=>{ fresh.forEach(p=>st.put(p)); }); }
+    catch(e){ notify('⚠️ ما گدرنا نحفظ الصور بهذا الجهاز'); return; }
+    notify(`انضافت ${fresh.length} صورة ✅`);
+    ppRender();
+  };
+  reader.onerror = ()=>notify('ما گدرنا نقرا الملف');
+  reader.readAsText(file);
+}
+
 // ================= water =================
 // drinking target ≈ 80% of EFSA total-water intake (≈20% comes from food): men 2.0 L, women 1.6 L
 function waterTarget(){ return data.profile && data.profile.sex==='f' ? 1600 : 2000; }

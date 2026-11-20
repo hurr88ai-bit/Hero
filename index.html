@@ -425,9 +425,14 @@
         <button class="primary" onclick="ppPick()">📸 ضيف صورة</button>
         <button class="ghost" id="pp-cmp-btn" onclick="ppCompare()" hidden>↔️ قبل وبعد</button>
       </div>
+      <div class="btn-row">
+        <button class="ghost" onclick="ppExport()">💾 نزّل نسخة من الصور</button>
+        <button class="ghost" onclick="document.getElementById('pp-import').click()">📂 استرجع الصور</button>
+        <input type="file" id="pp-import" accept=".json,application/json" hidden onchange="ppImport(this)">
+      </div>
       <input type="file" accept="image/*" id="pp-input" hidden onchange="ppAdd(this)">
       <div class="goal-note" id="pp-note"></div>
-      <div class="goal-note">🔒 الصور تبقى بموبايلك بس: ما تنرسل لأي مكان، وما تدخل بالنسخة الاحتياطية. إذا مسحت التطبيق أو بيانات المتصفح تنمسح.</div>
+      <div class="goal-note">🔒 الصور تبقى بموبايلك بس: ما تنرسل لأي مكان. نزّل منها ملف نسخة احتياطية (ينحفظ وين تختار إنت) وارجعها بأي وقت. إذا مسحت التطبيق أو بيانات المتصفح تنمسح من الجهاز.</div>
     </div>
 
     <div class="card">
